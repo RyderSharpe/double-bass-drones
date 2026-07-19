@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drone Circle</title>
+<style>
+  :root {
+    --bg: #10171b;
+    --panel: #17222a;
+    --panel-edge: #24343d;
+    --ink: #e8e2d4;
+    --muted: #7d8e95;
+    --brass: #c9a24b;
+    --brass-soft: #8a723a;
+    --wedge: #1b2830;
+    --wedge-hover: #223440;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 48px;
+  }
+  header { text-align: center; margin-bottom: 16px; }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.7rem;
+    letter-spacing: 0.06em;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .keys {
+    width: min(92vw, 560px);
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 10px;
+    padding: 14px 16px 16px;
+    margin-bottom: 20px;
+  }
+  .keys h2 {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .key-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 8px;
+  }
+  .key-btn {
+    background: var(--wedge);
+    color: var(--ink);
+    border: 1px solid var(--panel-edge);
+    border-radius: 7px;
+    padding: 8px 0 5px;
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    line-height: 1.1;
+  }
+  .key-btn small {
+    display: block;
+    font-family: system-ui, sans-serif;
+    font-size: 0.58rem;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+  .key-btn:hover { background: var(--wedge-hover); }
+  .key-btn.active {
+    background: var(--brass-soft);
+    border-color: var(--brass);
+    box-shadow: 0 0 8px rgba(201, 162, 75, 0.4);
+  }
+  .key-btn.active small { color: #fdf6e3; }
+  .key-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+
+  .ring-wrap { width: min(92vw, 520px); }
+  svg { width: 100%; height: auto; display: block; }
+
+  .wedge path {
+    fill: var(--wedge);
+    stroke: var(--bg);
+    stroke-width: 2.5;
+    cursor: pointer;
+    transition: fill 0.15s ease;
+  }
+  .wedge:hover path { fill: var(--wedge-hover); }
+  .wedge text {
+    fill: var(--muted);
+    font-size: 20px;
+    font-family: Georgia, serif;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+    transition: fill 0.15s ease;
+  }
+  .wedge.active path {
+    fill: var(--brass-soft);
+    stroke: var(--brass);
+    filter: drop-shadow(0 0 6px rgba(201, 162, 75, 0.45));
+  }
+  .wedge.active text { fill: #fdf6e3; }
+  .wedge:focus { outline: none; }
+  .wedge:focus-visible path { stroke: var(--ink); stroke-width: 3; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wedge.active path { animation: breathe 4s ease-in-out infinite; }
+    @keyframes breathe {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(201, 162, 75, 0.3)); }
+      50%      { filter: drop-shadow(0 0 10px rgba(201, 162, 75, 0.6)); }
+    }
+  }
+
+  #hub circle {
+    fill: var(--panel);
+    stroke: var(--panel-edge);
+    stroke-width: 1.5;
+    cursor: pointer;
+    transition: fill 0.15s ease;
+  }
+  #hub:hover circle { fill: #1d2c35; }
+  #hub text {
+    text-anchor: middle;
+    pointer-events: none;
+    font-family: system-ui, sans-serif;
+  }
+  #hub:focus { outline: none; }
+  #hub:focus-visible circle { stroke: var(--ink); stroke-width: 2.5; }
+  #hub-status { fill: var(--brass); font-size: 15px; }
+  #hub-label { fill: var(--muted); font-size: 11px; letter-spacing: 0.12em; }
+
+  .controls {
+    margin-top: 22px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px 24px;
+    width: min(92vw, 560px);
+  }
+  .control label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--panel-edge);
+    border-radius: 6px;
+    padding: 7px 9px;
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+  select:focus-visible, input:focus-visible, input[type="range"]:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 1px;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--brass);
+    margin-top: 8px;
+  }
+  .hint {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    max-width: min(92vw, 560px);
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Drone Circle</h1>
+  <p>Pick a key for its primary drones, or tap tones on the circle of fifths.</p>
+</header>
+
+<div class="keys">
+  <h2>Key presets &middot; primary drones (Scott Dixon chart)</h2>
+  <div class="key-grid" id="key-grid" role="group" aria-label="Key presets"></div>
+</div>
+
+<div class="ring-wrap">
+  <svg id="ring" viewBox="0 0 400 400" role="group" aria-label="Circle of fifths drone selector"></svg>
+</div>
+
+<div class="controls">
+  <div class="control">
+    <label for="octave">Octave</label>
+    <select id="octave">
+      <option value="1">1 (very low)</option>
+      <option value="2">2 (bass)</option>
+      <option value="3" selected>3 (cello range)</option>
+      <option value="4">4 (middle)</option>
+      <option value="5">5 (high)</option>
+    </select>
+  </div>
+  <div class="control">
+    <label for="wave">Timbre</label>
+    <select id="wave">
+      <option value="warm" selected>Warm (filtered saw)</option>
+      <option value="reed">Reed (filtered square)</option>
+      <option value="pure">Pure (sine)</option>
+      <option value="glass">Glass (triangle)</option>
+    </select>
+  </div>
+  <div class="control">
+    <label for="tuning">A4 reference (Hz)</label>
+    <input type="number" id="tuning" min="400" max="466" step="0.5" value="440">
+  </div>
+  <div class="control">
+    <label for="vol">Volume</label>
+    <input type="range" id="vol" min="0" max="100" value="60" aria-label="Master volume">
+  </div>
+</div>
+
+<p class="hint">A key button replaces whatever is sounding with that key's primary drone pairs, each voiced as root plus a perfect fifth above at the selected octave. Press the same key again to stop it. Wedge taps still add or remove single tones. Centre hub or Escape silences everything.</p>
+
+<script>
+(function () {
+  // ---- Circle of fifths, clockwise from the top ----
+  const NOTES = [
+    { label: "C",      pc: 0  },
+    { label: "G",      pc: 7  },
+    { label: "D",      pc: 2  },
+    { label: "A",      pc: 9  },
+    { label: "E",      pc: 4  },
+    { label: "B",      pc: 11 },
+    { label: "F\u266f/G\u266d", pc: 6  },
+    { label: "D\u266d", pc: 1  },
+    { label: "A\u266d", pc: 8  },
+    { label: "E\u266d", pc: 3  },
+    { label: "B\u266d", pc: 10 },
+    { label: "F",      pc: 5  }
+  ];
+
+  // ---- Drone pairs (root pc; the fifth is root + 7 semitones) ----
+  const PAIRS = {
+    "G/D":   7,
+    "D/A":   2,
+    "B/F#":  11,
+    "F#/C#": 6,
+    "Bb/F":  10,
+    "Eb/Bb": 3
+  };
+
+  // ---- Primary Drone(s) column, row by row from the chart ----
+  const KEYS = [
+    { key: "C",  pairs: ["G/D", "D/A"] },
+    { key: "G",  pairs: ["D/A"] },
+    { key: "D",  pairs: ["D/A"] },
+    { key: "A",  pairs: ["B/F#"] },
+    { key: "E",  pairs: ["B/F#", "F#/C#"] },
+    { key: "B",  pairs: ["B/F#", "F#/C#"] },
+    { key: "F\u266f", pairs: ["B/F#", "F#/C#"] },
+    { key: "C\u266f", pairs: ["F#/C#"] },
+    { key: "F",  pairs: ["G/D", "D/A"] },
+    { key: "B\u266d", pairs: ["Bb/F", "G/D"] },
+    { key: "E\u266d", pairs: ["Eb/Bb", "Bb/F"] },
+    { key: "A\u266d", pairs: ["Bb/F", "Eb/Bb"] },
+    { key: "D\u266d", pairs: ["Eb/Bb", "Bb/F"] },
+    { key: "G\u266d", pairs: ["Eb/Bb", "Bb/F"] },
+    { key: "C\u266d", pairs: ["Eb/Bb"] }
+  ];
+
+  const CX = 200, CY = 200, R_OUT = 190, R_IN = 92, R_HUB = 78;
+  const svg = document.getElementById("ring");
+  const NS = "http://www.w3.org/2000/svg";
+
+  // ---- Audio ----
+  // Voices are keyed by "offset": semitones above C of the selected base
+  // octave (0..18). pc = offset % 12. This lets a pair's fifth sit an
+  // octave boundary above its root while retuning stays consistent.
+  let ctx = null;
+  let master = null;
+  const voices = new Map();   // offset -> { oscs, gain, filter }
+  let activeKey = null;       // currently active key preset name, or null
+
+  const octaveEl = document.getElementById("octave");
+  const waveEl = document.getElementById("wave");
+  const tuningEl = document.getElementById("tuning");
+  const volEl = document.getElementById("vol");
+
+  const TIMBRES = {
+    warm:  { type: "sawtooth", cutoffMult: 4,  gain: 0.20 },
+    reed:  { type: "square",   cutoffMult: 3,  gain: 0.16 },
+    pure:  { type: "sine",     cutoffMult: 20, gain: 0.42 },
+    glass: { type: "triangle", cutoffMult: 10, gain: 0.35 }
+  };
+
+  function ensureCtx() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      master.gain.value = volEl.value / 100 * 0.5;
+      master.connect(ctx.destination);
+    }
+    if (ctx.state === "suspended") ctx.resume();
+  }
+
+  function freqOf(offset) {
+    const a4 = Math.min(466, Math.max(400, parseFloat(tuningEl.value) || 440));
+    const midi = (parseInt(octaveEl.value, 10) + 1) * 12 + offset;
+    return a4 * Math.pow(2, (midi - 69) / 12);
+  }
+
+  function startVoice(offset) {
+    if (voices.has(offset)) return;
+    ensureCtx();
+    const t = TIMBRES[waveEl.value];
+    const f = freqOf(offset);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(t.gain, ctx.currentTime + 0.25);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = Math.min(12000, f * t.cutoffMult);
+    filter.Q.value = 0.4;
+
+    const oscs = [-3, 3].map(cents => {
+      const o = ctx.createOscillator();
+      o.type = t.type;
+      o.frequency.value = f;
+      o.detune.value = cents;
+      o.connect(filter);
+      o.start();
+      return o;
+    });
+
+    filter.connect(gain);
+    gain.connect(master);
+    voices.set(offset, { oscs, gain, filter });
+  }
+
+  function stopVoice(offset) {
+    const v = voices.get(offset);
+    if (!v) return;
+    const now = ctx.currentTime;
+    v.gain.gain.cancelScheduledValues(now);
+    v.gain.gain.setValueAtTime(v.gain.gain.value, now);
+    v.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+    v.oscs.forEach(o => o.stop(now + 0.25));
+    voices.delete(offset);
+  }
+
+  function retuneAll() {
+    if (!ctx) return;
+    const t = TIMBRES[waveEl.value];
+    voices.forEach((v, offset) => {
+      const f = freqOf(offset);
+      v.oscs.forEach(o => o.frequency.setTargetAtTime(f, ctx.currentTime, 0.05));
+      v.filter.frequency.setTargetAtTime(Math.min(12000, f * t.cutoffMult), ctx.currentTime, 0.05);
+    });
+  }
+
+  function rebuildTimbre() {
+    if (!ctx) return;
+    [...voices.keys()].forEach(off => { stopVoice(off); startVoice(off); });
+  }
+
+  function syncUI() {
+    const soundingPcs = new Set([...voices.keys()].map(o => o % 12));
+    document.querySelectorAll(".wedge").forEach(w => {
+      const on = soundingPcs.has(parseInt(w.dataset.pc, 10));
+      w.classList.toggle("active", on);
+      w.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    document.querySelectorAll(".key-btn").forEach(b => {
+      const on = b.dataset.key === activeKey;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    const status = document.getElementById("hub-status");
+    if (voices.size === 0) {
+      status.textContent = "silent";
+    } else if (activeKey) {
+      status.textContent = "key of " + activeKey;
+    } else {
+      const names = NOTES.filter(n => soundingPcs.has(n.pc)).map(n => n.label.split("/")[0]);
+      status.textContent = names.join(" \u00b7 ");
+    }
+  }
+
+  function stopAll() {
+    [...voices.keys()].forEach(stopVoice);
+    activeKey = null;
+    syncUI();
+  }
+
+  // ---- Key presets ----
+  function keyOffsets(entry) {
+    const offs = new Set();
+    entry.pairs.forEach(name => {
+      const root = PAIRS[name];
+      offs.add(root);        // root of the pair
+      offs.add(root + 7);    // perfect fifth above it
+    });
+    return offs;
+  }
+
+  function pressKey(entry) {
+    if (activeKey === entry.key) { stopAll(); return; }
+    [...voices.keys()].forEach(stopVoice);
+    keyOffsets(entry).forEach(startVoice);
+    activeKey = entry.key;
+    syncUI();
+  }
+
+  const grid = document.getElementById("key-grid");
+  KEYS.forEach(entry => {
+    const b = document.createElement("button");
+    b.className = "key-btn";
+    b.dataset.key = entry.key;
+    b.setAttribute("aria-pressed", "false");
+    b.innerHTML = entry.key + "<small>" +
+      entry.pairs.join(", ").replace(/#/g, "\u266f").replace(/b\//g, "\u266d/").replace(/Bb/g, "B\u266d").replace(/Eb/g, "E\u266d") +
+      "</small>";
+    b.addEventListener("click", () => pressKey(entry));
+    grid.appendChild(b);
+  });
+
+  // ---- Wedges ----
+  function polar(r, deg) {
+    const rad = (deg - 90) * Math.PI / 180;
+    return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+  }
+
+  function toggleWedge(pc) {
+    // Removing a tone: drop every sounding voice of that pitch class,
+    // whichever octave a pair voiced it in. Adding: base octave.
+    const matching = [...voices.keys()].filter(o => o % 12 === pc);
+    if (matching.length > 0) {
+      matching.forEach(stopVoice);
+    } else {
+      startVoice(pc);
+    }
+    activeKey = null; // manual edit means we are no longer exactly a preset
+    syncUI();
+  }
+
+  NOTES.forEach((note, i) => {
+    const a0 = i * 30 - 15, a1 = a0 + 30;
+    const [x0o, y0o] = polar(R_OUT, a0), [x1o, y1o] = polar(R_OUT, a1);
+    const [x0i, y0i] = polar(R_IN, a0),  [x1i, y1i] = polar(R_IN, a1);
+    const d = `M ${x0o} ${y0o} A ${R_OUT} ${R_OUT} 0 0 1 ${x1o} ${y1o}
+               L ${x1i} ${y1i} A ${R_IN} ${R_IN} 0 0 0 ${x0i} ${y0i} Z`;
+
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "wedge");
+    g.dataset.pc = note.pc;
+    g.setAttribute("role", "button");
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("aria-pressed", "false");
+    g.setAttribute("aria-label", "Drone " + note.label.replace("\u266f", " sharp").replace("\u266d", " flat"));
+
+    const path = document.createElementNS(NS, "path");
+    path.setAttribute("d", d);
+    g.appendChild(path);
+
+    const [tx, ty] = polar((R_OUT + R_IN) / 2, i * 30);
+    const text = document.createElementNS(NS, "text");
+    text.setAttribute("x", tx);
+    text.setAttribute("y", ty);
+    text.textContent = note.label;
+    g.appendChild(text);
+
+    g.addEventListener("click", () => toggleWedge(note.pc));
+    g.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleWedge(note.pc); }
+    });
+    svg.appendChild(g);
+  });
+
+  // ---- Hub (stop all) ----
+  const hub = document.createElementNS(NS, "g");
+  hub.setAttribute("id", "hub");
+  hub.setAttribute("role", "button");
+  hub.setAttribute("tabindex", "0");
+  hub.setAttribute("aria-label", "Stop all drones");
+  const hc = document.createElementNS(NS, "circle");
+  hc.setAttribute("cx", CX); hc.setAttribute("cy", CY); hc.setAttribute("r", R_HUB);
+  hub.appendChild(hc);
+  const t1 = document.createElementNS(NS, "text");
+  t1.setAttribute("id", "hub-status");
+  t1.setAttribute("x", CX); t1.setAttribute("y", CY - 2);
+  t1.textContent = "silent";
+  hub.appendChild(t1);
+  const t2 = document.createElementNS(NS, "text");
+  t2.setAttribute("id", "hub-label");
+  t2.setAttribute("x", CX); t2.setAttribute("y", CY + 20);
+  t2.textContent = "TAP TO STOP ALL";
+  hub.appendChild(t2);
+  hub.addEventListener("click", stopAll);
+  hub.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); stopAll(); }
+  });
+  svg.appendChild(hub);
+
+  // ---- Control wiring ----
+  octaveEl.addEventListener("change", retuneAll);
+  tuningEl.addEventListener("input", retuneAll);
+  waveEl.addEventListener("change", rebuildTimbre);
+  volEl.addEventListener("input", () => {
+    if (master) master.gain.setTargetAtTime(volEl.value / 100 * 0.5, ctx.currentTime, 0.03);
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") stopAll();
+  });
+})();
+</script>
+</body>
+</html>

@@ -235,12 +235,19 @@
     <input type="number" id="tuning" min="400" max="466" step="0.5" value="440">
   </div>
   <div class="control">
+    <label for="temperament">Temperament</label>
+    <select id="temperament">
+      <option value="equal" selected>Equal</option>
+      <option value="just">Just (key centre D)</option>
+    </select>
+  </div>
+  <div class="control">
     <label for="vol">Volume</label>
     <input type="range" id="vol" min="0" max="100" value="60" aria-label="Master volume">
   </div>
 </div>
 
-<p class="hint">A key button replaces whatever is sounding with that key's primary drone pairs, each voiced as root plus a perfect fifth above at the selected octave. Press the same key again to stop it. Wedge taps still add or remove single tones. Centre hub or Escape silences everything.</p>
+<p class="hint">A key button replaces whatever is sounding with that key's primary drone pairs, each voiced as root plus a perfect fifth above at the selected octave. Press the same key again to stop it. Wedge taps still add or remove single tones. Switching Temperament to Just tunes every note as a pure stack of perfect fifths radiating from D, so all the primary drone pairs ring beat-free; Equal uses standard twelve-tone tuning. Centre hub or Escape silences everything.</p>
 
 <script>
 (function () {
@@ -306,6 +313,21 @@
   const waveEl = document.getElementById("wave");
   const tuningEl = document.getElementById("tuning");
   const volEl = document.getElementById("vol");
+  const temperamentEl = document.getElementById("temperament");
+
+  // How many pure 3/2 fifths each pitch class sits from D, moving through
+  // the same circle of fifths the ring is drawn from (D = 0).
+  const FIFTHS_FROM_D = { 0: -2, 1: 5, 2: 0, 3: -5, 4: 2, 5: -3,
+                           6: 4,  7: -1, 8: 6, 9: 1, 10: -4, 11: 3 };
+
+  // Stack `steps` pure fifths (3/2, or 2/3 if negative) and fold the
+  // result back into a single octave above the tonic.
+  function pythagoreanRatio(steps) {
+    let r = Math.pow(3 / 2, steps);
+    while (r >= 2) r /= 2;
+    while (r < 1) r *= 2;
+    return r;
+  }
 
   const TIMBRES = {
     warm:  { type: "sawtooth", cutoffMult: 4,  gain: 0.20 },
@@ -326,7 +348,21 @@
 
   function freqOf(offset) {
     const a4 = Math.min(466, Math.max(400, parseFloat(tuningEl.value) || 440));
-    const midi = (parseInt(octaveEl.value, 10) + 1) * 12 + offset;
+    const oct = parseInt(octaveEl.value, 10);
+
+    if (temperamentEl.value === "just") {
+      // Anchor D at this octave using equal temperament (so the A4 slider
+      // still sets overall reference pitch), then build every other note
+      // as a pure 3/2 fifth stacked some number of steps from that D.
+      const pc = ((offset % 12) + 12) % 12;
+      const octaveShift = Math.floor(offset / 12);
+      const dMidi = (oct + 1) * 12 + 2;
+      const freqD = a4 * Math.pow(2, (dMidi - 69) / 12);
+      const ratio = pythagoreanRatio(FIFTHS_FROM_D[pc]);
+      return freqD * ratio * Math.pow(2, octaveShift);
+    }
+
+    const midi = (oct + 1) * 12 + offset;
     return a4 * Math.pow(2, (midi - 69) / 12);
   }
 
@@ -526,6 +562,7 @@
   // ---- Control wiring ----
   octaveEl.addEventListener("change", retuneAll);
   tuningEl.addEventListener("input", retuneAll);
+  temperamentEl.addEventListener("change", retuneAll);
   waveEl.addEventListener("change", rebuildTimbre);
   volEl.addEventListener("input", () => {
     if (master) master.gain.setTargetAtTime(volEl.value / 100 * 0.5, ctx.currentTime, 0.03);

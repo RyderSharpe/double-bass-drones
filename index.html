@@ -315,19 +315,10 @@
   const volEl = document.getElementById("vol");
   const temperamentEl = document.getElementById("temperament");
 
-  // How many pure 3/2 fifths each pitch class sits from D, moving through
-  // the same circle of fifths the ring is drawn from (D = 0).
-  const FIFTHS_FROM_D = { 0: -2, 1: 5, 2: 0, 3: -5, 4: 2, 5: -3,
-                           6: 4,  7: -1, 8: 6, 9: 1, 10: -4, 11: 3 };
-
-  // Stack `steps` pure fifths (3/2, or 2/3 if negative) and fold the
-  // result back into a single octave above the tonic.
-  function pythagoreanRatio(steps) {
-    let r = Math.pow(3 / 2, steps);
-    while (r >= 2) r /= 2;
-    while (r < 1) r *= 2;
-    return r;
-  }
+  // Standard 5-limit Just intonation chromatic scale, indexed by semitone
+  // degree above the tonic (0-11): pure thirds/sixths/fifths, not a chain
+  // of stacked fifths. This is what tuner apps mean by "Just".
+  const DEGREE_RATIOS = [1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8];
 
   const TIMBRES = {
     warm:  { type: "sawtooth", cutoffMult: 4,  gain: 0.20 },
@@ -352,14 +343,15 @@
 
     if (temperamentEl.value === "just") {
       // Anchor D at this octave using equal temperament (so the A4 slider
-      // still sets overall reference pitch), then build every other note
-      // as a pure 3/2 fifth stacked some number of steps from that D.
-      const pc = ((offset % 12) + 12) % 12;
-      const octaveShift = Math.floor(offset / 12);
+      // still sets overall reference pitch), then look up every other
+      // note's pure ratio relative to that D, folding octaves around D
+      // itself rather than around C.
+      const semitoneFromD = offset - 2; // D sits 2 semitones above C
+      const degree = ((semitoneFromD % 12) + 12) % 12;
+      const octaveShift = Math.floor(semitoneFromD / 12);
       const dMidi = (oct + 1) * 12 + 2;
       const freqD = a4 * Math.pow(2, (dMidi - 69) / 12);
-      const ratio = pythagoreanRatio(FIFTHS_FROM_D[pc]);
-      return freqD * ratio * Math.pow(2, octaveShift);
+      return freqD * DEGREE_RATIOS[degree] * Math.pow(2, octaveShift);
     }
 
     const midi = (oct + 1) * 12 + offset;

@@ -228,6 +228,10 @@
       <option value="reed">Reed (filtered square)</option>
       <option value="pure">Pure (sine)</option>
       <option value="glass">Glass (triangle)</option>
+      <option value="organ">Organ (drawbar)</option>
+      <option value="bow">Bowed string</option>
+      <option value="choir">Choir (vowel formants)</option>
+      <option value="bell">Bell (FM)</option>
     </select>
   </div>
   <div class="control">
@@ -320,11 +324,227 @@
   // of stacked fifths. This is what tuner apps mean by "Just".
   const DEGREE_RATIOS = [1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8];
 
+  // Each timbre exposes build(ctx, freq) -> { output, retune(freq), stop(time) }.
+  // "output" is an unconnected AudioNode the caller wires into that voice's
+  // envelope gain. This lets simple (single-oscillator) and elaborate
+  // (multi-oscillator, filtered, modulated) timbres share one voice manager.
+
+  function buildDetunedBasic(type, cutoffMult) {
+    return function (ctx, f) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = Math.min(12000, f * cutoffMult);
+      filter.Q.value = 0.4;
+      const oscs = [-3, 3].map(cents => {
+        const o = ctx.createOscillator();
+        o.type = type;
+        o.frequency.value = f;
+        o.detune.value = cents;
+        o.connect(filter);
+        o.start();
+        return o;
+      });
+      return {
+        output: filter,
+        retune(newF) {
+          oscs.forEach(o => o.frequency.setTargetAtTime(newF, ctx.currentTime, 0.05));
+          filter.frequency.setTargetAtTime(Math.min(12000, newF * cutoffMult), ctx.currentTime, 0.05);
+        },
+        stop(t) { oscs.forEach(o => o.stop(t)); }
+      };
+    };
+  }
+
+  function buildPure(ctx, f) {
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = f;
+    osc.start();
+    return {
+      output: osc,
+      retune(newF) { osc.frequency.setTargetAtTime(newF, ctx.currentTime, 0.05); },
+      stop(t) { osc.stop(t); }
+    };
+  }
+
+  // Drawbar-style additive organ: five sine harmonics at fixed ratios with
+  // decreasing level, plus a slow Leslie-style amplitude tremolo.
+  function buildOrgan(ctx, f) {
+    const ratios = [1, 2, 3, 4, 6];
+    const levels = [1, 0.55, 0.35, 0.2, 0.12];
+    const mix = ctx.createGain();
+    mix.gain.value = 1;
+    const harmonics = ratios.map((r, i) => {
+      const o = ctx.createOscillator();
+      o.type = "sine";
+      o.frequency.value = f * r;
+      const g = ctx.createGain();
+      g.gain.value = levels[i];
+      o.connect(g);
+      g.connect(mix);
+      o.start();
+      return { osc: o, ratio: r };
+    });
+
+    const tremolo = ctx.createGain();
+    tremolo.gain.value = 1;
+    mix.connect(tremolo);
+    const lfo = ctx.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 5.5;
+    const lfoDepth = ctx.createGain();
+    lfoDepth.gain.value = 0.08; // +-8% amplitude wobble
+    lfo.connect(lfoDepth);
+    lfoDepth.connect(tremolo.gain);
+    lfo.start();
+
+    return {
+      output: tremolo,
+      retune(newF) {
+        harmonics.forEach(h => h.osc.frequency.setTargetAtTime(newF * h.ratio, ctx.currentTime, 0.05));
+      },
+      stop(t) { harmonics.forEach(h => h.osc.stop(t)); lfo.stop(t); }
+    };
+  }
+
+  // Bowed string: detuned saws, brighter filter than "Warm", with a slow
+  // pitch vibrato layered on top of the static detune.
+  function buildBow(ctx, f) {
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = Math.min(12000, f * 6);
+    filter.Q.value = 0.5;
+
+    const oscs = [-4, 4].map(cents => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.value = f;
+      o.detune.value = cents;
+      o.connect(filter);
+      o.start();
+      return o;
+    });
+
+    const lfo = ctx.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 5;
+    const lfoDepth = ctx.createGain();
+    lfoDepth.gain.value = 6; // +-6 cents of vibrato
+    lfo.connect(lfoDepth);
+    oscs.forEach(o => lfoDepth.connect(o.detune));
+    lfo.start();
+
+    return {
+      output: filter,
+      retune(newF) {
+        oscs.forEach(o => o.frequency.setTargetAtTime(newF, ctx.currentTime, 0.05));
+        filter.frequency.setTargetAtTime(Math.min(12000, newF * 6), ctx.currentTime, 0.05);
+      },
+      stop(t) { oscs.forEach(o => o.stop(t)); lfo.stop(t); }
+    };
+  }
+
+  // Choir: sawtooth core routed through three fixed-frequency bandpass
+  // filters approximating vowel formants, so the resonances stay put while
+  // the fundamental retunes underneath them, plus gentle vibrato.
+  function buildChoir(ctx, f) {
+    const oscs = [-3, 3].map(cents => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.value = f;
+      o.detune.value = cents;
+      o.start();
+      return o;
+    });
+
+    const formants = [
+      { freq: 700,  q: 8,  gain: 1.0 },
+      { freq: 1200, q: 10, gain: 0.6 },
+      { freq: 2600, q: 12, gain: 0.3 }
+    ];
+    const mix = ctx.createGain();
+    mix.gain.value = 1;
+    formants.forEach(spec => {
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.value = spec.freq;
+      bp.Q.value = spec.q;
+      const g = ctx.createGain();
+      g.gain.value = spec.gain;
+      oscs.forEach(o => o.connect(bp));
+      bp.connect(g);
+      g.connect(mix);
+    });
+    const makeup = ctx.createGain();
+    makeup.gain.value = 3.0; // narrow bandpasses discard most of the energy
+    mix.connect(makeup);
+
+    const lfo = ctx.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 5.3;
+    const lfoDepth = ctx.createGain();
+    lfoDepth.gain.value = 5;
+    lfo.connect(lfoDepth);
+    oscs.forEach(o => lfoDepth.connect(o.detune));
+    lfo.start();
+
+    return {
+      output: makeup,
+      retune(newF) {
+        // Formant filters stay put; vowel resonances don't move with pitch.
+        oscs.forEach(o => o.frequency.setTargetAtTime(newF, ctx.currentTime, 0.05));
+      },
+      stop(t) { oscs.forEach(o => o.stop(t)); lfo.stop(t); }
+    };
+  }
+
+  // Bell: two-operator FM (sine carrier, inharmonic-ratio sine modulator)
+  // for a metallic, non-harmonic-series tone, gently smoothed afterward.
+  function buildBell(ctx, f) {
+    const carrier = ctx.createOscillator();
+    carrier.type = "sine";
+    carrier.frequency.value = f;
+
+    const modRatio = 3.5;
+    const modulator = ctx.createOscillator();
+    modulator.type = "sine";
+    modulator.frequency.value = f * modRatio;
+
+    const modDepth = ctx.createGain();
+    modDepth.gain.value = f; // moderate modulation index
+    modulator.connect(modDepth);
+    modDepth.connect(carrier.frequency);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = Math.min(14000, f * 10);
+    filter.Q.value = 0.3;
+    carrier.connect(filter);
+
+    carrier.start();
+    modulator.start();
+
+    return {
+      output: filter,
+      retune(newF) {
+        carrier.frequency.setTargetAtTime(newF, ctx.currentTime, 0.05);
+        modulator.frequency.setTargetAtTime(newF * modRatio, ctx.currentTime, 0.05);
+        modDepth.gain.setTargetAtTime(newF, ctx.currentTime, 0.05);
+        filter.frequency.setTargetAtTime(Math.min(14000, newF * 10), ctx.currentTime, 0.05);
+      },
+      stop(t) { carrier.stop(t); modulator.stop(t); }
+    };
+  }
+
   const TIMBRES = {
-    warm:  { type: "sawtooth", cutoffMult: 4,  gain: 0.20 },
-    reed:  { type: "square",   cutoffMult: 3,  gain: 0.16 },
-    pure:  { type: "sine",     cutoffMult: 20, gain: 0.42 },
-    glass: { type: "triangle", cutoffMult: 10, gain: 0.35 }
+    warm:  { gain: 0.20, build: buildDetunedBasic("sawtooth", 4) },
+    reed:  { gain: 0.16, build: buildDetunedBasic("square", 3) },
+    pure:  { gain: 0.42, build: buildPure },
+    glass: { gain: 0.35, build: buildDetunedBasic("triangle", 10) },
+    organ: { gain: 0.12, build: buildOrgan },
+    bow:   { gain: 0.18, build: buildBow },
+    choir: { gain: 0.22, build: buildChoir, attack: 0.6, release: 0.5 },
+    bell:  { gain: 0.20, build: buildBell }
   };
 
   function ensureCtx() {
@@ -365,26 +585,12 @@
     const f = freqOf(offset);
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(t.gain, ctx.currentTime + 0.25);
+    gain.gain.exponentialRampToValueAtTime(t.gain, ctx.currentTime + (t.attack || 0.25));
 
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = Math.min(12000, f * t.cutoffMult);
-    filter.Q.value = 0.4;
-
-    const oscs = [-3, 3].map(cents => {
-      const o = ctx.createOscillator();
-      o.type = t.type;
-      o.frequency.value = f;
-      o.detune.value = cents;
-      o.connect(filter);
-      o.start();
-      return o;
-    });
-
-    filter.connect(gain);
+    const built = t.build(ctx, f);
+    built.output.connect(gain);
     gain.connect(master);
-    voices.set(offset, { oscs, gain, filter });
+    voices.set(offset, { built, gain, release: t.release || 0.2 });
   }
 
   function stopVoice(offset) {
@@ -393,18 +599,15 @@
     const now = ctx.currentTime;
     v.gain.gain.cancelScheduledValues(now);
     v.gain.gain.setValueAtTime(v.gain.gain.value, now);
-    v.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-    v.oscs.forEach(o => o.stop(now + 0.25));
+    v.gain.gain.exponentialRampToValueAtTime(0.0001, now + v.release);
+    v.built.stop(now + v.release + 0.05);
     voices.delete(offset);
   }
 
   function retuneAll() {
     if (!ctx) return;
-    const t = TIMBRES[waveEl.value];
     voices.forEach((v, offset) => {
-      const f = freqOf(offset);
-      v.oscs.forEach(o => o.frequency.setTargetAtTime(f, ctx.currentTime, 0.05));
-      v.filter.frequency.setTargetAtTime(Math.min(12000, f * t.cutoffMult), ctx.currentTime, 0.05);
+      v.built.retune(freqOf(offset));
     });
   }
 

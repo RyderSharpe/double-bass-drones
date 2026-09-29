@@ -28,42 +28,50 @@
     padding: 28px 16px 48px;
     position: relative;
   }
-  /* Film-grain texture, self-contained (no image asset): a fixed, static
-     noise layer over everything. Held still (no flicker) so it reads as a
-     textured surface rather than a flash; turned up further than a first
-     pass for a more visibly textured background. */
+  /* Worn-surface texture, self-contained (no image asset): three layered
+     noise passes -- a fine static grain, a coarser mottled blotch layer,
+     and a faint vertically-elongated streak layer -- standing in for a
+     scratched, worn surface without going as far as a heavily distressed
+     one. Held still (no flicker) so it reads as a textured surface rather
+     than a flash. */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 999;
-    opacity: 0.19;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsdGVyPSJ1cmwoI24pIi8+PC9zdmc+");
+    opacity: 0.17;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJtIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4yMiIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJzIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IDAuMDI1IiBudW1PY3RhdmVzPSIyIiBzZWVkPSI2IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIiByZXN1bHQ9InQiLz48ZmVDb2xvck1hdHJpeCBpbj0idCIgdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIgcmVzdWx0PSJnIi8+PGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImciPjxmZUZ1bmNSIHR5cGU9ImdhbW1hIiBhbXBsaXR1ZGU9IjEuMyIgZXhwb25lbnQ9IjIuOCIgb2Zmc2V0PSIwIi8+PGZlRnVuY0cgdHlwZT0iZ2FtbWEiIGFtcGxpdHVkZT0iMS4zIiBleHBvbmVudD0iMi44IiBvZmZzZXQ9IjAiLz48ZmVGdW5jQiB0eXBlPSJnYW1tYSIgYW1wbGl0dWRlPSIxLjMiIGV4cG9uZW50PSIyLjgiIG9mZnNldD0iMCIvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIyMCIgZmlsdGVyPSJ1cmwoI24pIi8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNtKSIgb3BhY2l0eT0iMC41Ii8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNzKSIgb3BhY2l0eT0iMC40NSIvPjwvc3ZnPg==");
     background-repeat: repeat;
-    background-size: 200px 200px;
+    background-size: 220px 220px;
   }
   /* CRT scanlines, drifting slowly upward like a TV with the vertical hold
-     off, instead of anything that flashes or flickers. */
+     off, instead of anything that flashes or flickers -- plus a faint
+     vignette (a soft warm glow off-center, fading out) echoing the worn,
+     uneven lighting of the reference textures. */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 998;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      rgba(238, 231, 216, 0.06) 0px,
-      rgba(238, 231, 216, 0.06) 1px,
-      transparent 1px,
-      transparent 4px
-    );
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(238, 231, 216, 0.06) 0px,
+        rgba(238, 231, 216, 0.06) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      radial-gradient(ellipse at 50% 40%, rgba(239, 227, 192, 0.05) 0%, transparent 60%);
+    background-repeat: repeat, no-repeat;
+    background-size: auto, cover;
   }
   @media (prefers-reduced-motion: no-preference) {
     body::after { animation: scanline-drift 9s linear infinite; }
     @keyframes scanline-drift {
-      from { background-position: 0 0; }
-      to   { background-position: 0 -4px; }
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 -4px, 0 0; }
     }
   }
   header { text-align: center; margin-bottom: 16px; }
@@ -85,6 +93,23 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--accent-soft);
+  }
+
+  /* Paper-fibre mottling for display type only (title, key letters): a
+     faint noise texture of dark flecks laid over the flat ink color and
+     clipped to the glyphs, so the text reads as unevenly-inked print
+     rather than a flat vector fill. Kept off small functional text
+     (subtitle, labels, status readout) so nothing legibility-critical is
+     touched. */
+  .paper-text, .key-letter {
+    background-image:
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIj48ZmlsdGVyIGlkPSJwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4zNSIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgcmVzdWx0PSJ0Ii8+PGZlQ29sb3JNYXRyaXggaW49InQiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjQ1IDAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTMwIiBoZWlnaHQ9IjEzMCIgZmlsdGVyPSJ1cmwoI3ApIi8+PC9zdmc+"),
+      linear-gradient(var(--paper-ink, var(--ink)), var(--paper-ink, var(--ink)));
+    background-size: 130px 130px, auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
 
   .keys {
@@ -135,6 +160,7 @@
     border-color: var(--accent);
     box-shadow: 0 0 14px rgba(239, 227, 192, 0.45);
   }
+  .key-btn.active .key-letter { --paper-ink: #1a1510; }
   .key-btn.active small { color: #4a4030; }
   .key-btn small .pair { transition: opacity 0.15s ease; }
   .key-btn.active small .pair { opacity: 0.6; }
@@ -165,6 +191,7 @@
     dominant-baseline: middle;
     pointer-events: none;
     transition: fill 0.15s ease;
+    filter: url(#paper-text);
   }
   .wedge.active path {
     fill: var(--accent);
@@ -207,6 +234,7 @@
     fill: var(--ink);
     font-size: 15px;
     font-family: Georgia, serif;
+    filter: url(#paper-text);
   }
   .ring-stamp line {
     stroke: var(--muted);
@@ -266,7 +294,7 @@
 <body>
 
 <header>
-  <h1>Drone Circle</h1>
+  <h1 class="paper-text">Drone Circle</h1>
   <p>Pick a key for its primary drones, or tap tones on the circle of fifths.</p>
   <p class="credit">Primary drone chart by Scott Dixon</p>
 </header>
@@ -277,7 +305,24 @@
 </div>
 
 <div class="ring-wrap">
-  <svg id="ring" viewBox="-150 -150 700 700" role="group" aria-label="Circle of fifths drone selector"></svg>
+  <svg id="ring" viewBox="-150 -150 700 700" role="group" aria-label="Circle of fifths drone selector">
+    <defs>
+      <!-- Same paper-fleck idea as the HTML title/key letters, done as a
+           native SVG filter so it applies cleanly to SVG <text>: generate
+           dark-fleck noise, mask it to the glyph's own alpha (operator
+           "in"), then merge it back over the original fill so the letters
+           stay fully legible with just a mottled, unevenly-inked look. -->
+      <filter id="paper-text" x="-20%" y="-40%" width="140%" height="180%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="3" seed="9" stitchTiles="stitch" result="t"/>
+        <feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.45 0" result="fleck"/>
+        <feComposite in="fleck" in2="SourceGraphic" operator="in" result="fleckOnGlyph"/>
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="fleckOnGlyph"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
 </div>
 
 <div class="controls">
@@ -802,7 +847,10 @@
     b.className = "key-btn";
     b.dataset.key = entry.key;
     b.setAttribute("aria-pressed", "false");
-    b.appendChild(document.createTextNode(entry.key));
+    const letter = document.createElement("span");
+    letter.className = "key-letter";
+    letter.textContent = entry.key;
+    b.appendChild(letter);
     const small = document.createElement("small");
     entry.pairs.forEach((p, i) => {
       if (i > 0) small.appendChild(document.createTextNode(", "));

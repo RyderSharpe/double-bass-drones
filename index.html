@@ -6,15 +6,15 @@
 <title>Drone Circle</title>
 <style>
   :root {
-    --bg: #10171b;
-    --panel: #17222a;
-    --panel-edge: #24343d;
-    --ink: #e8e2d4;
-    --muted: #7d8e95;
-    --brass: #c9a24b;
-    --brass-soft: #8a723a;
-    --wedge: #1b2830;
-    --wedge-hover: #223440;
+    --bg: #0c0a07;
+    --panel: #161310;
+    --panel-edge: #4a4438;
+    --ink: #eee7d8;
+    --muted: #8c8672;
+    --accent: #efe3c0;
+    --accent-soft: #a89968;
+    --wedge: #17140f;
+    --wedge-hover: #241f17;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -26,6 +26,45 @@
     flex-direction: column;
     align-items: center;
     padding: 28px 16px 48px;
+    position: relative;
+  }
+  /* Film-grain texture, self-contained (no image asset): a fixed, static
+     noise layer over everything. Held still (no flicker) so it reads as a
+     textured surface rather than a flash; turned up further than a first
+     pass for a more visibly textured background. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.19;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsdGVyPSJ1cmwoI24pIi8+PC9zdmc+");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+  /* CRT scanlines, drifting slowly upward like a TV with the vertical hold
+     off, instead of anything that flashes or flickers. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(238, 231, 216, 0.06) 0px,
+      rgba(238, 231, 216, 0.06) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body::after { animation: scanline-drift 9s linear infinite; }
+    @keyframes scanline-drift {
+      from { background-position: 0 0; }
+      to   { background-position: 0 -4px; }
+    }
   }
   header { text-align: center; margin-bottom: 16px; }
   h1 {
@@ -40,12 +79,19 @@
     margin-top: 6px;
     letter-spacing: 0.03em;
   }
+  header p.credit {
+    font-size: 0.72rem;
+    margin-top: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+  }
 
   .keys {
     width: min(92vw, 560px);
     background: var(--panel);
     border: 1px solid var(--panel-edge);
-    border-radius: 10px;
+    border-radius: 3px;
     padding: 14px 16px 16px;
     margin-bottom: 20px;
   }
@@ -66,12 +112,12 @@
     background: var(--wedge);
     color: var(--ink);
     border: 1px solid var(--panel-edge);
-    border-radius: 7px;
+    border-radius: 3px;
     padding: 8px 0 5px;
     font-family: Georgia, serif;
     font-size: 1.05rem;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.25s ease;
     line-height: 1.1;
   }
   .key-btn small {
@@ -84,14 +130,23 @@
   }
   .key-btn:hover { background: var(--wedge-hover); }
   .key-btn.active {
-    background: var(--brass-soft);
-    border-color: var(--brass);
-    box-shadow: 0 0 8px rgba(201, 162, 75, 0.4);
+    background: var(--accent);
+    color: #1a1510;
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(239, 227, 192, 0.45);
   }
-  .key-btn.active small { color: #fdf6e3; }
-  .key-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+  .key-btn.active small { color: #4a4030; }
+  .key-btn small .pair { transition: opacity 0.15s ease; }
+  .key-btn.active small .pair { opacity: 0.6; }
+  .key-btn.active small .pair.current {
+    opacity: 1;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .key-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-  .ring-wrap { width: min(92vw, 520px); }
+  .ring-wrap { width: min(92vw, 900px); }
   svg { width: 100%; height: auto; display: block; }
 
   .wedge path {
@@ -99,7 +154,7 @@
     stroke: var(--bg);
     stroke-width: 2.5;
     cursor: pointer;
-    transition: fill 0.15s ease;
+    transition: fill 0.2s ease, filter 0.3s ease;
   }
   .wedge:hover path { fill: var(--wedge-hover); }
   .wedge text {
@@ -112,19 +167,19 @@
     transition: fill 0.15s ease;
   }
   .wedge.active path {
-    fill: var(--brass-soft);
-    stroke: var(--brass);
-    filter: drop-shadow(0 0 6px rgba(201, 162, 75, 0.45));
+    fill: var(--accent);
+    stroke: var(--accent);
+    filter: drop-shadow(0 0 8px rgba(239, 227, 192, 0.55));
   }
-  .wedge.active text { fill: #fdf6e3; }
+  .wedge.active text { fill: #1a1510; }
   .wedge:focus { outline: none; }
   .wedge:focus-visible path { stroke: var(--ink); stroke-width: 3; }
 
   @media (prefers-reduced-motion: no-preference) {
     .wedge.active path { animation: breathe 4s ease-in-out infinite; }
     @keyframes breathe {
-      0%, 100% { filter: drop-shadow(0 0 4px rgba(201, 162, 75, 0.3)); }
-      50%      { filter: drop-shadow(0 0 10px rgba(201, 162, 75, 0.6)); }
+      0%, 100% { filter: drop-shadow(0 0 5px rgba(239, 227, 192, 0.4)); }
+      50%      { filter: drop-shadow(0 0 12px rgba(239, 227, 192, 0.75)); }
     }
   }
 
@@ -135,7 +190,7 @@
     cursor: pointer;
     transition: fill 0.15s ease;
   }
-  #hub:hover circle { fill: #1d2c35; }
+  #hub:hover circle { fill: #201c16; }
   #hub text {
     text-anchor: middle;
     pointer-events: none;
@@ -143,14 +198,28 @@
   }
   #hub:focus { outline: none; }
   #hub:focus-visible circle { stroke: var(--ink); stroke-width: 2.5; }
-  #hub-status { fill: var(--brass); font-size: 15px; }
+  #hub-status { fill: var(--accent); font-size: 15px; }
   #hub-label { fill: var(--muted); font-size: 11px; letter-spacing: 0.12em; }
+
+  /* Outer ring: decorative bass-clef circle-of-fifths reference */
+  #ring-layer { pointer-events: none; }
+  .ring-label {
+    fill: var(--ink);
+    font-size: 15px;
+    font-family: Georgia, serif;
+  }
+  .ring-stamp line {
+    stroke: var(--muted);
+    stroke-width: 1;
+    opacity: 0.55;
+  }
+  .ring-stamp path { fill: var(--accent); }
 
   .controls {
     margin-top: 22px;
     background: var(--panel);
     border: 1px solid var(--panel-edge);
-    border-radius: 10px;
+    border-radius: 3px;
     padding: 18px 20px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -170,18 +239,18 @@
     background: var(--bg);
     color: var(--ink);
     border: 1px solid var(--panel-edge);
-    border-radius: 6px;
+    border-radius: 3px;
     padding: 7px 9px;
     font-size: 0.9rem;
     font-family: inherit;
   }
   select:focus-visible, input:focus-visible, input[type="range"]:focus-visible {
-    outline: 2px solid var(--brass);
+    outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
   input[type="range"] {
     width: 100%;
-    accent-color: var(--brass);
+    accent-color: var(--accent);
     margin-top: 8px;
   }
   .hint {
@@ -199,15 +268,16 @@
 <header>
   <h1>Drone Circle</h1>
   <p>Pick a key for its primary drones, or tap tones on the circle of fifths.</p>
+  <p class="credit">Primary drone chart by Scott Dixon</p>
 </header>
 
 <div class="keys">
-  <h2>Key presets &middot; primary drones (Scott Dixon chart)</h2>
+  <h2>Key presets &middot; primary drones</h2>
   <div class="key-grid" id="key-grid" role="group" aria-label="Key presets"></div>
 </div>
 
 <div class="ring-wrap">
-  <svg id="ring" viewBox="0 0 400 400" role="group" aria-label="Circle of fifths drone selector"></svg>
+  <svg id="ring" viewBox="-150 -150 700 700" role="group" aria-label="Circle of fifths drone selector"></svg>
 </div>
 
 <div class="controls">
@@ -250,8 +320,6 @@
     <input type="range" id="vol" min="0" max="100" value="60" aria-label="Master volume">
   </div>
 </div>
-
-<p class="hint">A key button replaces whatever is sounding with that key's primary drone pairs, each voiced as root plus a perfect fifth above at the selected octave. Press the same key again to stop it. Wedge taps still add or remove single tones. Switching Temperament to Just tunes every note as a pure stack of perfect fifths radiating from D, so all the primary drone pairs ring beat-free; Equal uses standard twelve-tone tuning. Centre hub or Escape silences everything.</p>
 
 <script>
 (function () {
@@ -304,6 +372,49 @@
   const svg = document.getElementById("ring");
   const NS = "http://www.w3.org/2000/svg";
 
+  // ---- Outer ring: bass-clef circle-of-fifths key signatures ----
+  // Decorative reference ring, one stamp per wedge, in the same
+  // circle-of-fifths order as NOTES, so stamp i sits at angle i*30deg,
+  // directly outside wedge i.
+  const RING_L = 7; // staff line spacing
+  // Glyph outlines below are traced from Bravura (SIL Open Font License),
+  // the standard SMuFL reference music font, not hand-drawn: extracted with
+  // fontTools from Bravura.otf at their real design coordinates (1000
+  // units/em, 250 units per staff-space, glyph origin = the line/space the
+  // glyph anchors to). Filled shapes, not stroked lines, which is what
+  // gives real engraving its calligraphic weight.
+  const RING_GLYPH_SCALE = RING_L / 250;
+  const RING_CLEF_PATH = "M252 262C78 262 0 135 0 39C0 -41 42 -110 123 -110C186 -110 229 -66 229 -4C229 60 182 100 133 100C106 100 96 93 83 93C70 93 67 101 67 111C67 151 127 224 229 224C335 224 381 120 381 -37C381 -140 359 -260 297 -356C237 -449 134 -534 10 -605C1 -610 -5 -615 -5 -623C-5 -629 -1 -635 8 -635C13 -635 19 -633 25 -630C158 -565 286 -489 392 -375C479 -281 531 -159 531 -28C531 146 425 262 252 262ZM629 180C598 180 574 156 574 125C574 94 598 70 629 70C660 70 684 94 684 125C684 156 660 180 629 180ZM630 -71C599 -71 576 -94 576 -125C576 -156 599 -179 630 -179C661 -179 684 -156 684 -125C684 -94 661 -71 630 -71Z";
+  const RING_SHARP_PATH = "M237 118C244 121 249 129 249 135V206C249 211 246 214 242 214C240 214 239 214 237 213C237 213 217 205 212 204C205 204 198 209 198 217V339C198 345 192 350 184 350C174 350 168 345 168 339V209C167 199 164 186 155 180C143 173 109 159 92 155C83 155 80 167 80 175V295C80 301 73 306 66 306C56 306 50 301 50 295V160C50 146 44 136 38 133C32 130 12 122 12 122C5 120 0 112 0 106V35C0 29 3 26 8 26C9 26 11 27 12 27C12 27 27 33 34 37C35 37 36 38 37 38C44 38 50 28 50 20V-79C50 -90 45 -99 39 -102C33 -104 12 -113 12 -113C5 -115 0 -123 0 -129V-200C0 -206 3 -209 8 -209C9 -209 11 -208 12 -208C12 -208 26 -202 35 -199C36 -198 37 -198 38 -198C45 -198 50 -209 50 -214V-337C50 -343 56 -348 63 -348C73 -348 80 -343 80 -337V-198C80 -185 85 -178 90 -176L151 -151C152 -151 154 -150 155 -150C163 -150 168 -162 168 -168V-293C168 -299 174 -304 181 -304C192 -304 198 -299 198 -293V-151C198 -143 202 -131 209 -128C216 -125 237 -117 237 -117C244 -114 249 -106 249 -100V-29C249 -24 246 -21 242 -21C240 -21 239 -21 237 -22L211 -32C205 -32 198 -26 198 -14V79C198 86 203 105 211 108ZM168 -45C162 -65 115 -85 92 -85C86 -85 81 -83 80 -80C78 -76 77 -54 77 -30C77 1 78 36 80 44C82 61 128 82 153 82C160 82 166 80 168 76C170 71 172 46 172 19C172 -8 170 -36 168 -45Z";
+  const RING_FLAT_PATH  = "M12 -170C15 -174 18 -175 21 -175C24 -175 27 -173 27 -173C57 -156 81 -129 106 -112C195 -50 226 11 226 57C226 114 182 150 136 153C129 153 122 152 115 150C104 147 92 143 81 136C75 131 64 122 59 122C57 122 56 122 54 123C47 126 43 133 43 140C44 162 50 402 50 422C50 433 41 439 31 439C17 439 1 429 0 411C0 411 4 -160 12 -170ZM47 -81C47 -81 44 -21 44 19C44 35 45 47 46 51C50 63 76 85 90 93C99 98 108 100 116 100C126 100 135 96 141 89C151 78 157 61 157 42C157 24 152 3 140 -18C127 -42 98 -74 68 -93C64 -95 61 -96 58 -96C49 -96 47 -86 47 -81Z";
+  const RING_CLEF_X = 5;            // left margin before the clef
+  const RING_CLEF_ANCHOR_Y = -3 * RING_L; // F line (line 4, counting bottom=1): the clef's design origin sits on this line
+  const RING_SHARP_ORDER = [6, 3, 7, 4, 8, 5, 9]; // F# C# G# D# A# E# B#, as staff-position indices
+  const RING_FLAT_ORDER  = [2, 5, 1, 4, 0, 3, -1]; // Bb Eb Ab Db Gb Cb Fb
+  const RING_ACC_START_X = 30;
+  const RING_ACC_DX = 10;
+  const RING_STAFF_X0 = 0, RING_STAFF_X1 = 95;
+  const RING_STAFF_MID_LOCAL = -2 * RING_L; // line 3 (local y), the staff's vertical middle
+  const R_LABEL = 214; // key-name label radius
+  const R_STAFF = 267; // staff vertical-center radius
+
+  const OUTER_KEYS = [
+    { label: "C",       sharps: 0, flats: 0 },
+    { label: "G",       sharps: 1, flats: 0 },
+    { label: "D",       sharps: 2, flats: 0 },
+    { label: "A",       sharps: 3, flats: 0 },
+    { label: "E",       sharps: 4, flats: 0 },
+    { label: "B",       sharps: 5, flats: 0 },
+    { label: "F♯", sharps: 6, flats: 0 },
+    { label: "D♭", sharps: 0, flats: 5 },
+    { label: "A♭", sharps: 0, flats: 4 },
+    { label: "E♭", sharps: 0, flats: 3 },
+    { label: "B♭", sharps: 0, flats: 2 },
+    { label: "F",       sharps: 0, flats: 1 }
+  ];
+
+  function ringIndexToY(i) { return -i * (RING_L / 2); }
+
   // ---- Audio ----
   // Voices are keyed by "offset": semitones above C of the selected base
   // octave (0..18). pc = offset % 12. This lets a pair's fifth sit an
@@ -312,6 +423,7 @@
   let master = null;
   const voices = new Map();   // offset -> { oscs, gain, filter }
   let activeKey = null;       // currently active key preset name, or null
+  let activePairIndex = 0;    // which of that key's primary pairs is sounding
 
   const octaveEl = document.getElementById("octave");
   const waveEl = document.getElementById("wave");
@@ -627,12 +739,17 @@
       const on = b.dataset.key === activeKey;
       b.classList.toggle("active", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.querySelectorAll(".pair").forEach((span, i) => {
+        span.classList.toggle("current", on && i === activePairIndex);
+      });
     });
     const status = document.getElementById("hub-status");
     if (voices.size === 0) {
       status.textContent = "silent";
     } else if (activeKey) {
-      status.textContent = "key of " + activeKey;
+      const entry = KEYS.find(k => k.key === activeKey);
+      const pairLabel = entry ? formatPairLabel(entry.pairs[activePairIndex]) : "";
+      status.textContent = "key of " + activeKey + (entry && entry.pairs.length > 1 ? " · " + pairLabel : "");
     } else {
       const names = NOTES.filter(n => soundingPcs.has(n.pc)).map(n => n.label.split("/")[0]);
       status.textContent = names.join(" \u00b7 ");
@@ -642,24 +759,39 @@
   function stopAll() {
     [...voices.keys()].forEach(stopVoice);
     activeKey = null;
+    activePairIndex = 0;
     syncUI();
   }
 
   // ---- Key presets ----
-  function keyOffsets(entry) {
-    const offs = new Set();
-    entry.pairs.forEach(name => {
-      const root = PAIRS[name];
-      offs.add(root);        // root of the pair
-      offs.add(root + 7);    // perfect fifth above it
-    });
-    return offs;
+  // Each key preset lists one or two "primary drone pairs" (Scott Dixon
+  // chart). Only one pair sounds at a time: the chart means "use G/D or
+  // D/A", not "use both at once". Pressing the key's button again cycles
+  // to its next pair; if it only has one pair, pressing again stops it.
+  function formatPairLabel(name) {
+    return name.replace(/#/g, "\u266f").replace(/b\//g, "\u266d/").replace(/Bb/g, "B\u266d").replace(/Eb/g, "E\u266d");
+  }
+
+  function pairOffsets(pairName) {
+    const root = PAIRS[pairName];
+    return new Set([root, root + 7]); // root plus a perfect fifth above it
   }
 
   function pressKey(entry) {
-    if (activeKey === entry.key) { stopAll(); return; }
+    if (activeKey === entry.key) {
+      if (entry.pairs.length > 1) {
+        activePairIndex = (activePairIndex + 1) % entry.pairs.length;
+        [...voices.keys()].forEach(stopVoice);
+        pairOffsets(entry.pairs[activePairIndex]).forEach(startVoice);
+        syncUI();
+      } else {
+        stopAll();
+      }
+      return;
+    }
     [...voices.keys()].forEach(stopVoice);
-    keyOffsets(entry).forEach(startVoice);
+    activePairIndex = 0;
+    pairOffsets(entry.pairs[0]).forEach(startVoice);
     activeKey = entry.key;
     syncUI();
   }
@@ -670,9 +802,19 @@
     b.className = "key-btn";
     b.dataset.key = entry.key;
     b.setAttribute("aria-pressed", "false");
-    b.innerHTML = entry.key + "<small>" +
-      entry.pairs.join(", ").replace(/#/g, "\u266f").replace(/b\//g, "\u266d/").replace(/Bb/g, "B\u266d").replace(/Eb/g, "E\u266d") +
-      "</small>";
+    b.appendChild(document.createTextNode(entry.key));
+    const small = document.createElement("small");
+    entry.pairs.forEach((p, i) => {
+      if (i > 0) small.appendChild(document.createTextNode(", "));
+      const span = document.createElement("span");
+      span.className = "pair";
+      span.textContent = formatPairLabel(p);
+      small.appendChild(span);
+    });
+    b.appendChild(small);
+    if (entry.pairs.length > 1) {
+      b.title = "Click again to switch between " + entry.pairs.map(formatPairLabel).join(" and ");
+    }
     b.addEventListener("click", () => pressKey(entry));
     grid.appendChild(b);
   });
@@ -693,6 +835,7 @@
       startVoice(pc);
     }
     activeKey = null; // manual edit means we are no longer exactly a preset
+    activePairIndex = 0;
     syncUI();
   }
 
@@ -753,6 +896,74 @@
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); stopAll(); }
   });
   svg.appendChild(hub);
+
+  // ---- Outer ring: bass-clef circle-of-fifths (decorative reference) ----
+  const ringLayer = document.createElementNS(NS, "g");
+  ringLayer.setAttribute("id", "ring-layer");
+  ringLayer.setAttribute("aria-hidden", "true");
+
+  OUTER_KEYS.forEach((k, i) => {
+    const angle = i * 30;
+    const stampWidth = RING_STAFF_X1 - RING_STAFF_X0;
+
+    const [lx, ly] = polar(R_LABEL, angle);
+    const label = document.createElementNS(NS, "text");
+    label.setAttribute("class", "ring-label");
+    label.setAttribute("x", lx);
+    label.setAttribute("y", ly);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("dominant-baseline", "central");
+    label.textContent = k.label;
+    ringLayer.appendChild(label);
+
+    const [sx, sy] = polar(R_STAFF, angle);
+    const tx = sx - stampWidth / 2;
+    const ty = sy - RING_STAFF_MID_LOCAL;
+    const stamp = document.createElementNS(NS, "g");
+    stamp.setAttribute("class", "ring-stamp");
+    stamp.setAttribute("transform", `translate(${tx},${ty})`);
+
+    for (let li = 0; li < 5; li++) {
+      const y = -li * RING_L;
+      const line = document.createElementNS(NS, "line");
+      line.setAttribute("x1", RING_STAFF_X0);
+      line.setAttribute("y1", y);
+      line.setAttribute("x2", RING_STAFF_X1);
+      line.setAttribute("y2", y);
+      stamp.appendChild(line);
+    }
+
+    // Stamps one music-font glyph so its design origin lands at local
+    // point (x, y), scaled from font units into staff-space units.
+    function stampGlyph(pathData, x, y) {
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("transform",
+        `translate(${x},${y}) scale(${RING_GLYPH_SCALE},${-RING_GLYPH_SCALE})`);
+      const p = document.createElementNS(NS, "path");
+      p.setAttribute("d", pathData);
+      g.appendChild(p);
+      stamp.appendChild(g);
+    }
+
+    stampGlyph(RING_CLEF_PATH, RING_CLEF_X, RING_CLEF_ANCHOR_Y);
+
+    let ax = RING_ACC_START_X;
+    if (k.sharps > 0) {
+      for (let n = 0; n < k.sharps; n++) {
+        stampGlyph(RING_SHARP_PATH, ax, ringIndexToY(RING_SHARP_ORDER[n]));
+        ax += RING_ACC_DX;
+      }
+    } else if (k.flats > 0) {
+      for (let n = 0; n < k.flats; n++) {
+        stampGlyph(RING_FLAT_PATH, ax, ringIndexToY(RING_FLAT_ORDER[n]));
+        ax += RING_ACC_DX;
+      }
+    }
+
+    ringLayer.appendChild(stamp);
+  });
+
+  svg.appendChild(ringLayer);
 
   // ---- Control wiring ----
   octaveEl.addEventListener("change", retuneAll);

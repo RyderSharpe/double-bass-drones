@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modal Interchange Chart</title>
+<style>
+  :root {
+    --bg: #0c0a07;
+    --panel: #1c1712;
+    --panel-edge: #5c5340;
+    --ink: #eee7d8;
+    --muted: #8c8672;
+    --accent: #efe3c0;
+    --accent-soft: #a89968;
+    --wedge: #17140f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 14px 8px;
+    position: relative;
+  }
+  /* Same worn-surface texture as the Drone Circle page, for visual
+     consistency between the two pages. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.24;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJtIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4yMiIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJzIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IDAuMDI1IiBudW1PY3RhdmVzPSIyIiBzZWVkPSI2IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIiByZXN1bHQ9InQiLz48ZmVDb2xvck1hdHJpeCBpbj0idCIgdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIgcmVzdWx0PSJnIi8+PGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImciPjxmZUZ1bmNSIHR5cGU9ImdhbW1hIiBhbXBsaXR1ZGU9IjEuNSIgZXhwb25lbnQ9IjIuNCIgb2Zmc2V0PSIwIi8+PGZlRnVuY0cgdHlwZT0iZ2FtbWEiIGFtcGxpdHVkZT0iMS41IiBleHBvbmVudD0iMi40IiBvZmZzZXQ9IjAiLz48ZmVGdW5jQiB0eXBlPSJnYW1tYSIgYW1wbGl0dWRlPSIxLjUiIGV4cG9uZW50PSIyLjQiIG9mZnNldD0iMCIvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIyMCIgZmlsdGVyPSJ1cmwoI24pIi8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNtKSIgb3BhY2l0eT0iMC42Ii8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNzKSIgb3BhY2l0eT0iMC41OCIvPjwvc3ZnPg==");
+    background-repeat: repeat;
+    background-size: 220px 220px;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(238, 231, 216, 0.095) 0px,
+        rgba(238, 231, 216, 0.095) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      radial-gradient(ellipse at 50% 40%, rgba(239, 227, 192, 0.09) 0%, transparent 62%);
+    background-repeat: repeat, no-repeat;
+    background-size: auto, cover;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body::after { animation: scanline-drift 9s linear infinite; }
+    @keyframes scanline-drift {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 -4px, 0 0; }
+    }
+  }
+
+  .back-link {
+    align-self: flex-start;
+    color: var(--muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    margin-bottom: 3px;
+    max-width: 1220px;
+    width: 100%;
+    flex: none;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  header { text-align: center; margin-bottom: 4px; flex: none; }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    background-image:
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIj48ZmlsdGVyIGlkPSJwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4zNSIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgcmVzdWx0PSJ0Ii8+PGZlQ29sb3JNYXRyaXggaW49InQiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjYgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIiBmaWx0ZXI9InVybCgjcCkiLz48L3N2Zz4="),
+      linear-gradient(var(--ink), var(--ink));
+    background-size: 130px 130px, auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 0.6rem;
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+
+  .chart-wrap {
+    width: 100%;
+    max-width: 1220px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    table-layout: fixed;
+  }
+  tbody th { width: 12%; }
+  th, td {
+    border: 1px solid var(--panel-edge);
+    padding: 2px 4px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.92rem;
+    line-height: 1.1;
+    overflow-wrap: break-word;
+  }
+  thead th {
+    color: var(--accent);
+    font-family: Georgia, serif;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    background: var(--wedge);
+    padding: 3px 4px;
+  }
+  tbody th {
+    text-align: left;
+    color: var(--ink);
+    font-family: Georgia, serif;
+    font-size: 0.94rem;
+    letter-spacing: 0.01em;
+    background: var(--panel);
+  }
+  tbody th .sub {
+    color: var(--muted);
+    font-size: 0.82em;
+    font-family: system-ui, sans-serif;
+    font-style: normal;
+  }
+  td .roman {
+    color: var(--ink);
+    font-weight: 600;
+    display: block;
+  }
+  td .chord {
+    display: block;
+    color: var(--ink);
+  }
+  td .tensions {
+    display: block;
+    color: var(--muted);
+    font-size: 0.86em;
+  }
+  td .scale {
+    display: block;
+    color: var(--accent-soft);
+    font-style: italic;
+    font-size: 0.84em;
+    line-height: 1.1;
+  }
+
+  .wordmark {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.56rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    flex: none;
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="./">&larr; Drone Circle</a>
+
+<header>
+  <h1>Modal Interchange Chart</h1>
+  <p>Diatonic chords, tensions, and the resulting mode for each degree of each parent scale &mdash; spelled out in the key of C.</p>
+</header>
+
+<div class="chart-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">I</th>
+        <th scope="col">II</th>
+        <th scope="col">III</th>
+        <th scope="col">IV</th>
+        <th scope="col">V</th>
+        <th scope="col">VI</th>
+        <th scope="col">VII</th>
+      </tr>
+    </thead>
+    <tbody id="chart-body"></tbody>
+  </table>
+</div>
+
+<p class="wordmark">RyderSharpeMusic</p>
+
+<script>
+  // Each cell: [roman-numeral chord, chord spelled in C, tensions, resulting scale]
+  const ROWS = [
+    { mode: "Ionian\n(Major)", cells: [
+      ["Imaj7","Cmaj7","(9,13)","Ionian"],
+      ["II-7","D-7","(9,11)","Dorian"],
+      ["III-7","E-7","(11)","Phrygian"],
+      ["IVmaj7","Fmaj7","(9,♯11,13)","Lydian"],
+      ["V7","G7","(9,13)","Mixolydian"],
+      ["VI-7","A-7","(9,11)","Aeolian"],
+      ["VII-7♭5","B-7♭5","(11,♭13)","Locrian"],
+    ]},
+    { mode: "Dorian", cells: [
+      ["I-7","C-7","(9,11,13)","Dorian"],
+      ["II-7","D-7","(11)","Phrygian"],
+      ["♭IIImaj7","E♭maj7","(9,♯11,13)","Lydian"],
+      ["IV7","F7","(9,13)","Mixolydian"],
+      ["V-7","G-7","(9,11)","Aeolian"],
+      ["VI-7♭5","A-7♭5","(11,♭13)","Locrian"],
+      ["♭VIImaj7","B♭maj7","(9,13)","Ionian"],
+    ]},
+    { mode: "Phrygian", cells: [
+      ["I-7","C-7","(11)","Phrygian"],
+      ["♭IImaj7","D♭maj7","(9,♯11,13)","Lydian"],
+      ["♭III7","E♭7","(9,13)","Mixolydian"],
+      ["IV-7","F-7","(9,11)","Aeolian"],
+      ["V-7♭5","G-7♭5","(11,♭13)","Locrian"],
+      ["♭VImaj7","A♭maj7","(9,13)","Ionian"],
+      ["♭VII-7","B♭-7","(9,11,13)","Dorian"],
+    ]},
+    { mode: "Lydian", cells: [
+      ["Imaj7","Cmaj7","(9,♯11,13)","Lydian"],
+      ["II7","D7","(9,13)","Mixolydian"],
+      ["III-7","E-7","(9,11)","Aeolian"],
+      ["♯IV-7♭5","F♯-7♭5","(11,♭13)","Locrian"],
+      ["Vmaj7","Gmaj7","(9,13)","Ionian"],
+      ["VI-7","A-7","(9,11,13)","Dorian"],
+      ["VII-7","B-7","(11)","Phrygian"],
+    ]},
+    { mode: "Mixolydian", cells: [
+      ["I7","C7","(9,13)","Mixolydian"],
+      ["II-7","D-7","(9,11)","Aeolian"],
+      ["III-7♭5","E-7♭5","(11,♭13)","Locrian"],
+      ["IVmaj7","Fmaj7","(9,13)","Ionian"],
+      ["V-7","G-7","(9,11,13)","Dorian"],
+      ["VI-7","A-7","(11)","Phrygian"],
+      ["♭VIImaj7","B♭maj7","(9,♯11,13)","Lydian"],
+    ]},
+    { mode: "Aeolian\n(Nat. Minor)", cells: [
+      ["I-7","C-7","(9,11)","Aeolian"],
+      ["II-7♭5","D-7♭5","(11,♭13)","Locrian"],
+      ["♭IIImaj7","E♭maj7","(9,13)","Ionian"],
+      ["IV-7","F-7","(9,11,13)","Dorian"],
+      ["V-7","G-7","(11)","Phrygian"],
+      ["♭VImaj7","A♭maj7","(9,♯11,13)","Lydian"],
+      ["♭VII7","B♭7","(9,13)","Mixolydian"],
+    ]},
+    { mode: "Locrian", cells: [
+      ["I-7♭5","C-7♭5","(11,♭13)","Locrian"],
+      ["IImaj7","Dmaj7","(9,13)","Ionian"],
+      ["♭III-7","E♭-7","(9,11,13)","Dorian"],
+      ["IV-7","F-7","(11)","Phrygian"],
+      ["♭Vmaj7","G♭maj7","(9,♯11,13)","Lydian"],
+      ["♭VI7","A♭7","(9,13)","Mixolydian"],
+      ["♭VII-7","B♭-7","(9,11)","Aeolian"],
+    ]},
+    { mode: "Harmonic Minor", cells: [
+      ["I-maj7","C-maj7","(9,11)","Harmonic Minor"],
+      ["II-7♭5","D-7♭5","(11,13)","Locrian Natural 6"],
+      ["♭IIImaj7♯5","E♭maj7♯5","(9)","Ionian ♯5 or Harmonic Major"],
+      ["IV-7","F-7","(9,♯11,13)","Dorian ♯4 or Romanian"],
+      ["V7","G7","(♭9,♭13)","Mixo♭9♭13, Spanish Phrygian, or Phrygian Dominant"],
+      ["♭VImaj7","A♭maj7","(♯9,♯11,13)","Lydian ♯2"],
+      ["VIIdim7","Bdim7","(9,♭13)",""],
+    ]},
+    { mode: "Melodic Minor", cells: [
+      ["I-maj7","C-maj7","(9,11,13)","Melodic Minor"],
+      ["II-7 or II7sus4","D-7 or D7sus4♭9","(♭9,11,13)","Dorian ♭9"],
+      ["♭IIImaj♯5","E♭maj7♯5","(9,♯11,13)","Lydian ♯5 or Lydian Augmented"],
+      ["IV7","F7","(9,♯11,13)","Lydian ♭7, Lydian Dominant, or Overtone"],
+      ["V7","G7","(9,♭13)","Mixo ♭13 or Hindu"],
+      ["VI-7♭5","A-7♭5","(9,11,♭13)","Locrian nat.9"],
+      ["VIIalt","B7alt, B7♯9","(♭9,♯9,♭13)","Altered, Super Locrian, or Dim/Whole Tone"],
+    ]},
+  ];
+
+  const tbody = document.getElementById("chart-body");
+  ROWS.forEach(row => {
+    const tr = document.createElement("tr");
+    const th = document.createElement("th");
+    th.scope = "row";
+    th.innerHTML = row.mode.split("\n").join(" <span class='sub'>").concat(row.mode.includes("\n") ? "</span>" : "");
+    tr.appendChild(th);
+    row.cells.forEach(([roman, chord, tensions, scale]) => {
+      const td = document.createElement("td");
+      td.innerHTML =
+        `<span class="roman">${roman}</span>` +
+        `<span class="chord">${chord}</span>` +
+        `<span class="tensions">${tensions}</span>` +
+        (scale ? `<span class="scale">${scale}</span>` : "");
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complete List of Practice Strategies</title>
+<style>
+  :root {
+    --bg: #0c0a07;
+    --panel: #1c1712;
+    --panel-edge: #5c5340;
+    --ink: #eee7d8;
+    --muted: #8c8672;
+    --accent: #efe3c0;
+    --accent-soft: #a89968;
+    --wedge: #17140f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 40px;
+    position: relative;
+  }
+  /* Same worn-surface texture as the Drone Circle page, for visual
+     consistency across all three pages. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.24;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJtIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4yMiIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJzIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IDAuMDI1IiBudW1PY3RhdmVzPSIyIiBzZWVkPSI2IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIiByZXN1bHQ9InQiLz48ZmVDb2xvck1hdHJpeCBpbj0idCIgdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIgcmVzdWx0PSJnIi8+PGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImciPjxmZUZ1bmNSIHR5cGU9ImdhbW1hIiBhbXBsaXR1ZGU9IjEuNSIgZXhwb25lbnQ9IjIuNCIgb2Zmc2V0PSIwIi8+PGZlRnVuY0cgdHlwZT0iZ2FtbWEiIGFtcGxpdHVkZT0iMS41IiBleHBvbmVudD0iMi40IiBvZmZzZXQ9IjAiLz48ZmVGdW5jQiB0eXBlPSJnYW1tYSIgYW1wbGl0dWRlPSIxLjUiIGV4cG9uZW50PSIyLjQiIG9mZnNldD0iMCIvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIyMCIgZmlsdGVyPSJ1cmwoI24pIi8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNtKSIgb3BhY2l0eT0iMC42Ii8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNzKSIgb3BhY2l0eT0iMC41OCIvPjwvc3ZnPg==");
+    background-repeat: repeat;
+    background-size: 220px 220px;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(238, 231, 216, 0.095) 0px,
+        rgba(238, 231, 216, 0.095) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      radial-gradient(ellipse at 50% 40%, rgba(239, 227, 192, 0.09) 0%, transparent 62%);
+    background-repeat: repeat, no-repeat;
+    background-size: auto, cover;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body::after { animation: scanline-drift 9s linear infinite; }
+    @keyframes scanline-drift {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 -4px, 0 0; }
+    }
+  }
+
+  .back-link {
+    align-self: flex-start;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    margin-bottom: 18px;
+    max-width: 720px;
+    width: 100%;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  header { text-align: center; margin-bottom: 26px; max-width: 720px; width: 100%; }
+  .eyebrow {
+    display: block;
+    color: var(--muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.7rem;
+    letter-spacing: 0.03em;
+    background-image:
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIj48ZmlsdGVyIGlkPSJwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4zNSIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgcmVzdWx0PSJ0Ii8+PGZlQ29sb3JNYXRyaXggaW49InQiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjYgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIiBmaWx0ZXI9InVybCgjcCkiLz48L3N2Zz4="),
+      linear-gradient(var(--ink), var(--ink));
+    background-size: 130px 130px, auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+  .citation {
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-top: 12px;
+    letter-spacing: 0.01em;
+    line-height: 1.5;
+  }
+  .citation em { color: var(--accent-soft); font-style: italic; }
+
+  main {
+    width: 100%;
+    max-width: 720px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    padding: 8px 32px 20px;
+  }
+
+  h2.section {
+    text-align: center;
+    color: var(--accent);
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: 36px 0 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--panel-edge);
+  }
+  h2.section:first-child { border-top: none; margin-top: 18px; padding-top: 0; }
+
+  h3.chapter {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 1.12rem;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    margin: 0 0 14px;
+    scroll-margin-top: 20px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0 0 20px;
+    padding-left: 1.3em;
+  }
+  main > ul:last-child { margin-bottom: 4px; }
+  li {
+    position: relative;
+    margin: 0.42em 0;
+    line-height: 1.5;
+  }
+  li::before {
+    content: "\2022";
+    position: absolute;
+    left: -1.1em;
+    color: var(--accent-soft);
+  }
+  li ul {
+    margin: 0.3em 0 0.3em;
+    padding-left: 1.2em;
+  }
+  /* Secondary list tiers read as the same ink fading slightly into the
+     page, rather than switching to the warm brass tone used for emphasis
+     and links elsewhere — keeps the hierarchy legible without introducing
+     a muddy, unrelated hue. */
+  li ul li {
+    font-size: 0.93em;
+    color: rgba(238, 231, 216, 0.74);
+  }
+  li ul li::before { color: var(--muted); opacity: 0.8; }
+  li ul ul li {
+    font-size: 0.95em;
+    color: rgba(238, 231, 216, 0.56);
+  }
+  em { font-style: italic; color: var(--accent-soft); }
+  a.ref { color: var(--accent-soft); text-decoration: none; border-bottom: 1px dotted var(--panel-edge); }
+  a.ref:hover { color: var(--accent); }
+
+  .wordmark {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="./">&larr; Drone Circle</a>
+
+<header>
+  <span class="eyebrow">Appendix A</span>
+  <h1>Complete List of Practice Strategies</h1>
+  <p class="citation">From <em>Learn Faster, Perform Better: A Musician&rsquo;s Guide to the Neuroscience of Practicing</em> by Molly Gebrian.</p>
+</header>
+
+<main>
+
+  <h2 class="section">Section I</h2>
+
+  <h3 class="chapter" id="ch1">Chapter 1: Good Practicing and How It Changes the Brain</h3>
+  <ul>
+    <li>Start with your hard spots:
+      <ul>
+        <li>Figure out <em>why</em> you are having trouble as precisely as you can.</li>
+        <li>Break the problem down into smaller, manageable parts.</li>
+        <li>Solidify the solution using one of the methods below:
+          <ul>
+            <li>Play it correctly at least five times in a row.</li>
+            <li>Overlearning: If it took you 10 tries to get it right, do at least 5 correct repetitions (50% overlearning); 10 is even better (100% overlearning).</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>Ask: &ldquo;Which pathway am I reinforcing by how I&rsquo;m practicing?&rdquo;</li>
+    <li>Intonation:
+      <ul>
+        <li>Stop on the note in question.</li>
+        <li><em>Don&rsquo;t</em> adjust.</li>
+        <li>Figure out whether it&rsquo;s flat or sharp.</li>
+        <li>Stop on the note in question until it&rsquo;s perfectly in tune without adjusting to achieve at least 50% overlearning.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 class="chapter" id="ch2">Chapter 2: Practice Like a Pro</h3>
+  <ul>
+    <li>Keep going when you feel frustrated.</li>
+    <li>Use the Three Step Model:
+      <ul>
+        <li>Step 1: Set specific goals.</li>
+        <li>Step 2: Monitor your progress toward those goals closely.
+          <ul>
+            <li>Record yourself and listen back to help with this step.</li>
+          </ul>
+        </li>
+        <li>Step 3: Evaluate how you did and precisely why things did or didn&rsquo;t go well.</li>
+      </ul>
+    </li>
+    <li>Divide your music into Red, Yellow, and Green sections. Start with the Red sections.
+      <ul>
+        <li>Red = emergencies.</li>
+        <li>Yellow = not great, but not emergencies.</li>
+        <li>Green = acceptable for now.</li>
+      </ul>
+    </li>
+    <li>Work backward.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch3">Chapter 3: Use Errors to Your Advantage</h3>
+  <ul>
+    <li>Amplification of error:
+      <ul>
+        <li>Exaggerate the main cause of the bad habit.</li>
+      </ul>
+    </li>
+    <li>Old way/new way:
+      <ul>
+        <li>Step 1: Watch a video of the old way and the new way.</li>
+        <li>Step 2: Perform and describe the old way.</li>
+        <li>Step 3: Perform and describe the new way.</li>
+        <li>Step 4: Alternate between the old way and the new way (perform and describe).</li>
+        <li>Step 5: Do the new way several times.</li>
+      </ul>
+    </li>
+    <li>Instead of practicing in front of a mirror, video-record yourself and watch back.</li>
+  </ul>
+
+  <h2 class="section">Section II</h2>
+
+  <h3 class="chapter" id="ch4">Chapter 4: The Fastest Way to Learn Music: Take More Breaks</h3>
+  <ul>
+    <li>Practice for shorter amounts of time with breaks in between.</li>
+    <li>Microbreaks:
+      <ul>
+        <li>Do three correct repetitions.</li>
+        <li>Take a 10-second break.</li>
+        <li>Do three more correct repetitions.</li>
+        <li>If any of the repetitions had errors, start over and repeat the process.</li>
+      </ul>
+    </li>
+    <li>During longer breaks, practice contrasting music.</li>
+    <li>Avoid retroactive interference:
+      <ul>
+        <li>Take a 6-hour break between practicing two very similar passages when they are new.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 class="chapter" id="ch5">Chapter 5: Can You Learn Music in Your Sleep?</h3>
+  <ul>
+    <li>Get a full night of sleep to enhance performance the next day.</li>
+    <li>Take a short nap or just rest quietly after practicing to boost learning.</li>
+    <li>Take a nap between practicing similar passages to mitigate retroactive interference.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch6">Chapter 6: What&rsquo;s the Perfect Schedule of Breaks?</h3>
+  <ul>
+    <li>Err on the side of longer breaks.</li>
+    <li>Breaks should be shorter when music is new, longer when you know it better:
+      <ul>
+        <li>Microbreaks.</li>
+        <li>Revisit the same passage two to three times within a day when new.</li>
+        <li>Once something is comfortable, take a day or two off from practicing it.</li>
+      </ul>
+    </li>
+    <li>My practice schedule for new music:
+      <ul>
+        <li>Three days in a row then take a day off.</li>
+        <li>Every other day three times (Monday, Wednesday, Friday), then take a week off.</li>
+        <li>Three days in a row, then take two weeks off.</li>
+        <li>Three days in a row.</li>
+        <li>Three is the average: sometimes it&rsquo;s two days, sometimes four.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 class="chapter" id="ch7">Chapter 7: Be More Consistent in Performance</h3>
+  <ul>
+    <li>Use interleaved practice to help prepare for performance.</li>
+    <li>Serial practice:
+      <ul>
+        <li>Make a list of hard spots and perform each spot, one after the other.</li>
+        <li>A good performance gets a tick mark for that spot.</li>
+        <li>A poor performance means you must erase any tick marks you&rsquo;ve already gotten for that spot.</li>
+        <li>The goal is to get five tick marks per spot.</li>
+      </ul>
+    </li>
+    <li>Interval timer practice:
+      <ul>
+        <li>Every time the timer goes off, perform your chosen spot.</li>
+      </ul>
+    </li>
+    <li>Time-constrained practice:
+      <ul>
+        <li>Switch what you&rsquo;re working on every two to five minutes.</li>
+      </ul>
+    </li>
+    <li>Perform in a random order:
+      <ul>
+        <li>Divide your music into sections, number them, and then draw numbers at random.</li>
+      </ul>
+    </li>
+    <li>Interleaved practice for new music:
+      <ul>
+        <li>Return to spots practiced previously after working on other music in the interim.</li>
+      </ul>
+    </li>
+    <li>Late night/early morning mock performance.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch8">Chapter 8: Why Exact Repetitions May Not Be the Best Goal</h3>
+  <ul>
+    <li>See Appendix C for instrument-specific ideas.</li>
+    <li>Practice at a variety of tempos.</li>
+    <li>Practice with different expressive parameters (separately or combined):
+      <ul>
+        <li>Articulations.</li>
+        <li>Tone colors.</li>
+        <li>Dynamics.</li>
+        <li>Vibratos.</li>
+      </ul>
+    </li>
+    <li>Play with opposite articulations and/or dynamics.</li>
+    <li>Create a skeleton version of the piece.</li>
+    <li>Fill in longer note values with subdivided repeated notes.</li>
+    <li>Play a passage with a variety of different emotional intentions.</li>
+    <li>Play a passage as if you were different famous musicians.</li>
+    <li>Alternate between physical and mental practice, one bar at a time.</li>
+    <li>Introduce small physical challenges:
+      <ul>
+        <li>Eyes closed.</li>
+        <li>Walking in a circle.</li>
+        <li>Walking backward.</li>
+        <li>Standing on one leg.</li>
+        <li>Bend knees/going up on tip-toes.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2 class="section">Section III</h2>
+
+  <h3 class="chapter" id="ch9">Chapter 9: The Power of Mental Practice</h3>
+  <ul>
+    <li>Try to feel and hear everything you need to be aware of while playing, but inside your head.</li>
+    <li>Try dynamic mental practice: move slightly while you hear/feel the music inside your head.</li>
+    <li>Try AOMI: watch someone (or yourself) perform what you&rsquo;re working on while practicing mentally at the same time.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch10">Chapter 10: Mental Practice and the Brain</h3>
+  <ul>
+    <li>20 minutes of mental practice seems to be the optimal amount of time before taking a break.</li>
+    <li>Try alternating between mental and physical practice.</li>
+    <li>Try to hear the exact quality of sound and intonation you want.</li>
+    <li>For kids: imagine watching yourself playing on a big TV on the wall.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch11">Chapter 11: How to Focus to Play Your Best</h3>
+  <ul>
+    <li>Focus on quality of sound and expressive intent rather than the details of what your body must do.</li>
+    <li>Focus on what the instrument has to do rather than what the body has to do.</li>
+    <li>A focus closer to the body is better at lower skill levels; a focus farther from the body is better at higher skill levels.</li>
+    <li>Give feedback that focuses on the effect of the action rather than the physical mechanics of the action.</li>
+    <li>Use analogies instead of language that focuses on body mechanics.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch12">Chapter 12: The Most Effective Ways to Memorize Music</h3>
+  <ul>
+    <li>Chunk your music for deeper encoding.</li>
+    <li>Use performance cues to help with encoding:
+      <ul>
+        <li>Structural cues (best).</li>
+        <li>Expressive cues (best).</li>
+        <li>Interpretive cues.</li>
+        <li>Basic cues.</li>
+      </ul>
+    </li>
+    <li>Have multiple copies of your music marked differently:
+      <ul>
+        <li>Structural landmarks.</li>
+        <li>Harmonic analysis.</li>
+        <li>Expressive words for each phrase/section.</li>
+      </ul>
+    </li>
+    <li>Solidify muscle memory, auditory memory, and declarative memory separately:
+      <ul>
+        <li>Muscle memory
+          <ul>
+            <li>Play without sound (from memory).</li>
+            <li>De-tune your instrument and play from memory.</li>
+          </ul>
+        </li>
+        <li>Auditory memory
+          <ul>
+            <li>Sing from memory (neutral syllable, solf&egrave;ge, note names, finger numbers).</li>
+            <li>Sing then play one note at a time.</li>
+          </ul>
+        </li>
+        <li>Declarative memory
+          <ul>
+            <li>Draw a formal diagram from memory.</li>
+            <li>Write out your music from memory on a blank piece of staff paper.</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>Work on developing the auditory/motor coactivation:
+      <ul>
+        <li>Figure out something by ear every day on your instrument.</li>
+        <li>Play something from memory every day on your instrument.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 class="chapter" id="ch13">Chapter 13: Boost Confidence in Memorized Performance</h3>
+  <ul>
+    <li>Get enough sleep for optimal consolidation.</li>
+    <li>Practice the hardest section to memorize last before sleep and first thing the next day.</li>
+    <li>Practice retrieval until it is automatic.</li>
+    <li>Aim to have all your music memorized at least six weeks before the performance.</li>
+    <li>Start testing your memory from the very beginning of learning something new.</li>
+    <li>If you can&rsquo;t remember what comes next, try to figure it out by listening to a recording rather than looking at the music right away.</li>
+    <li>Mental practice from memory.</li>
+    <li>Use the serial practice list technique to test memory (<a class="ref" href="#ch7">Chapter 7</a>).</li>
+    <li>Play from memory in a random order.</li>
+    <li>Use an interval timer to test memory.</li>
+    <li>Video-record yourself playing from memory in the practice room.</li>
+    <li>Play from memory while thinking about big picture things:
+      <ul>
+        <li>Sound.</li>
+        <li>Expression.</li>
+        <li>Phrasing.</li>
+        <li>Character.</li>
+        <li>Musical intentions.</li>
+      </ul>
+    </li>
+    <li>Play from memory for others often leading up to the performance.</li>
+  </ul>
+
+  <h2 class="section">Section IV</h2>
+
+  <h3 class="chapter" id="ch14">Chapter 14: Improving Rhythm and Tempo</h3>
+  <ul>
+    <li>To improve sense of pulse, have the metronome click:
+      <ul>
+        <li>On off-beats only.</li>
+        <li>Every other beat.</li>
+        <li>Every downbeat only.</li>
+        <li>Every other downbeat only.</li>
+        <li>Every third downbeat only.</li>
+        <li>Use TimeGuru or TonalEnergy with the random mute function.</li>
+      </ul>
+    </li>
+    <li>Walk in place to develop an internal sense of pulse.</li>
+    <li>Walk in place musically, so step depth shows metrical/musical hierarchy.</li>
+  </ul>
+
+  <h3 class="chapter" id="ch15">Chapter 15: Improving Pitch and Intonation</h3>
+  <ul>
+    <li>Use a pitch discrimination app like InTune to improve your ear.</li>
+    <li>Practice singing the individual notes of dissonant intervals out loud while playing both.</li>
+    <li>Sing what you are playing out loud.</li>
+    <li>Use a drone instead of a tuner.</li>
+    <li>Work to develop your audiation abilities:
+      <ul>
+        <li>Sing scales, intervals, and simple songs in your head.</li>
+        <li>Sing a drone in your head while playing.</li>
+        <li>Play a scale and don&rsquo;t go to the next note until you can hear it in your head first.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 class="chapter" id="ch16">Chapter 16: How to Play Faster</h3>
+  <ul>
+    <li>Play in different rhythms.</li>
+    <li>Play in different slurring patterns.</li>
+    <li>Click up the passage with the metronome.</li>
+    <li>Use interleaved clicking up #1 to learn fast passages.</li>
+    <li>Use interleaved clicking up #2 to simulate playing at tempo.</li>
+    <li>Use at-tempo chunking to simulate playing at tempo.</li>
+    <li>Use at-tempo chunking for runs in asymmetrical tuplets.</li>
+    <li>Practice in multiples (8, 4, 3, 2) for techniques that don&rsquo;t work at slower tempos.</li>
+  </ul>
+
+  <h3 class="chapter" id="conclusion">Conclusion: Bringing It All Together</h3>
+  <ul>
+    <li>Use a practice journal to write:
+      <ul>
+        <li>Goals.</li>
+        <li>Problems and their solutions.</li>
+        <li>A list of what your teacher said in your lesson.</li>
+        <li>A list of what to work on in your next practice session.</li>
+      </ul>
+    </li>
+    <li>Scheduling:
+      <ul>
+        <li>Don&rsquo;t practice more than five hours a day.</li>
+        <li>Take at least a 5-minute break every 25&ndash;30 minutes.</li>
+        <li>Take at least a 90-minute break every 60&ndash;90 minutes.</li>
+      </ul>
+    </li>
+    <li>Focus:
+      <ul>
+        <li>Put on a timer for a short amount of time and gradually increase to work on the ability to focus.</li>
+        <li>Give yourself an uncomfortably short amount of time to work on something.</li>
+        <li>Set a timer to go off every 5&ndash;10 minutes and when it does, explain out loud your goal in that moment, what strategy you are using, and why.</li>
+      </ul>
+    </li>
+    <li>Motivation
+      <ul>
+        <li>Figure out ahead of time when you are going to practice. Put it in your planner.</li>
+        <li>Be flexible: if your schedule gets disrupted, don&rsquo;t throw it all out the window.</li>
+        <li>Start small: do one tiny thing that feels manageable.</li>
+      </ul>
+    </li>
+    <li>Use the Red-Yellow-Green method (<a class="ref" href="#ch2">Chapter 2</a>) to combat overwhelm.</li>
+    <li>Use habit-bundling to link something you like to do/are already in the habit of doing with practicing.</li>
+    <li>Find a practice buddy and hold each other accountable.</li>
+    <li>Prioritize rest: if you&rsquo;re exhausted and burnt out, you won&rsquo;t feel like practicing.</li>
+  </ul>
+
+</main>
+
+<p class="wordmark">RyderSharpeMusic</p>
+
+</body>
+</html>

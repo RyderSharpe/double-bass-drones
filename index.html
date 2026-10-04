@@ -153,6 +153,48 @@
     font-weight: 500;
     margin-bottom: 10px;
   }
+
+  .tip-of-week {
+    width: min(92vw, 560px);
+    background: #1c1712;
+    border: 1px solid #5c5340;
+    border-radius: 3px;
+    padding: 14px 18px 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+  .tip-of-week h2 {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .tip-of-week .tip-text {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .tip-of-week .tip-source {
+    margin-top: 8px;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+  }
+  .tip-of-week .tip-source a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--panel-edge);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .tip-of-week .tip-source a:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
   .key-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
@@ -339,7 +381,14 @@
   <p>Pick a key for its primary drones, or tap tones on the circle of fifths.</p>
   <p class="credit">Primary drone chart inspired by Scott Dixon</p>
   <p class="chart-link"><a href="modal-interchange.html">Modal Interchange Chart &rarr;</a></p>
+  <p class="chart-link"><a href="practice-strategies.html">Complete List of Practice Strategies &rarr;</a></p>
 </header>
+
+<div class="tip-of-week">
+  <h2>Strategy of the week</h2>
+  <p class="tip-text" id="tip-text"></p>
+  <p class="tip-source" id="tip-source"></p>
+</div>
 
 <div class="keys">
   <h2>Key presets &middot; primary drones</h2>
@@ -1242,6 +1291,100 @@
     if (e.key === "Escape") stopAll();
   });
 })();
+</script>
+
+<script>
+  // "Strategy of the week" — a curated, standalone-readable subset of the
+  // tips on the Complete List of Practice Strategies page. Picked by the
+  // current calendar week number rather than randomly or by localStorage,
+  // so every visitor sees the same tip all week, it changes on its own the
+  // following week, and it needs no backend or browser storage at all.
+  // This list is a hand-picked, lightly-condensed excerpt kept in sync by
+  // hand with practice-strategies.html; if that page's content changes
+  // meaningfully, update this array to match.
+  (() => {
+    const PRACTICE_TIPS = [
+      { text: "Figure out why you are having trouble as precisely as you can, then break the problem down into smaller, manageable parts.", source: "Chapter 1" },
+      { text: "Ask yourself: “Which pathway am I reinforcing by how I’m practicing?”", source: "Chapter 1" },
+      { text: "When working on intonation, stop on the note in question, don’t adjust, and figure out whether it’s flat or sharp.", source: "Chapter 1" },
+      { text: "Keep going when you feel frustrated.", source: "Chapter 2" },
+      { text: "Use the Three Step Model: set specific goals, monitor your progress closely, then evaluate how you did and why.", source: "Chapter 2" },
+      { text: "Divide your music into Red, Yellow, and Green sections, and start with the Red, emergency, sections.", source: "Chapter 2" },
+      { text: "Work backward.", source: "Chapter 2" },
+      { text: "When fixing a bad habit, try amplification of error: exaggerate its main cause so you can feel the difference.", source: "Chapter 3" },
+      { text: "Instead of practicing in front of a mirror, video-record yourself and watch it back.", source: "Chapter 3" },
+      { text: "Practice for shorter amounts of time, with real breaks in between.", source: "Chapter 4" },
+      { text: "Try a microbreak: three correct repetitions, a 10-second break, then three more. Any error in a repetition, and you start the set over.", source: "Chapter 4" },
+      { text: "During longer breaks, practice contrasting music.", source: "Chapter 4" },
+      { text: "Take a 6-hour break between practicing two very similar new passages, to avoid retroactive interference.", source: "Chapter 4" },
+      { text: "Get a full night of sleep. It measurably improves performance the next day.", source: "Chapter 5" },
+      { text: "Take a short nap, or just rest quietly, after practicing. It boosts learning.", source: "Chapter 5" },
+      { text: "When in doubt, err on the side of longer breaks.", source: "Chapter 6" },
+      { text: "Keep breaks shorter while music is new, and longer once you know it well.", source: "Chapter 6" },
+      { text: "Use interleaved practice to prepare for performance.", source: "Chapter 7" },
+      { text: "Try serial practice: list your hard spots and perform each in turn. A good performance earns a tick mark; a poor one erases any already earned for that spot. The goal is five tick marks per spot.", source: "Chapter 7" },
+      { text: "Try a late-night or early-morning mock performance.", source: "Chapter 7" },
+      { text: "Practice at a variety of tempos, not just the target one.", source: "Chapter 8" },
+      { text: "Vary your expressive parameters, separately or combined: articulation, tone color, dynamics, vibrato.", source: "Chapter 8" },
+      { text: "Build a skeleton version of the piece, stripped to its essentials.", source: "Chapter 8" },
+      { text: "Play a passage as if you were a different famous musician.", source: "Chapter 8" },
+      { text: "Introduce a small physical challenge while practicing: eyes closed, walking in a circle, walking backward, or standing on one leg.", source: "Chapter 8" },
+      { text: "Try to feel and hear everything you need to be aware of while playing, entirely inside your head.", source: "Chapter 9" },
+      { text: "Try AOMI: watch someone, even yourself, perform what you’re working on while you mentally practice it at the same time.", source: "Chapter 9" },
+      { text: "Twenty minutes seems to be the optimal length for a mental-practice session before a break.", source: "Chapter 10" },
+      { text: "Alternate between mental and physical practice.", source: "Chapter 10" },
+      { text: "Focus on the quality of sound and expressive intent, not on the details of what your body must do.", source: "Chapter 11" },
+      { text: "A focus closer to the body helps more at lower skill levels; a focus farther from the body helps more at higher ones.", source: "Chapter 11" },
+      { text: "Use analogies instead of language that focuses on body mechanics.", source: "Chapter 11" },
+      { text: "Chunk your music for deeper encoding.", source: "Chapter 12" },
+      { text: "Use performance cues to help with encoding. Structural and expressive cues work best.", source: "Chapter 12" },
+      { text: "Keep multiple copies of your music, each marked differently: one with structural landmarks, one with harmonic analysis, one with expressive words.", source: "Chapter 12" },
+      { text: "Solidify muscle, auditory, and declarative memory separately, not all at once.", source: "Chapter 12" },
+      { text: "Build auditory/motor coactivation: figure something out by ear, and play something from memory, every day.", source: "Chapter 12" },
+      { text: "Get enough sleep. It’s when memory consolidation actually happens.", source: "Chapter 13" },
+      { text: "Practice your hardest section to memorize last before sleep, and first thing the next morning.", source: "Chapter 13" },
+      { text: "Aim to have everything memorized at least six weeks before the performance.", source: "Chapter 13" },
+      { text: "Start testing your memory from the very beginning of learning something new, not after it feels ready.", source: "Chapter 13" },
+      { text: "Stuck mid-piece? Try to work it out by listening to a recording before you look at the music.", source: "Chapter 13" },
+      { text: "Play from memory in a random order, not always start to finish.", source: "Chapter 13" },
+      { text: "Play from memory for others often, in the weeks leading up to a performance.", source: "Chapter 13" },
+      { text: "To sharpen your sense of pulse, have the metronome click on off-beats only, or every other beat, instead of every beat.", source: "Chapter 14" },
+      { text: "Walk in place to develop an internal sense of pulse.", source: "Chapter 14" },
+      { text: "Use a pitch-discrimination app, like InTune, to train your ear.", source: "Chapter 15" },
+      { text: "Practice with a drone instead of a tuner.", source: "Chapter 15" },
+      { text: "Sing what you are playing, out loud.", source: "Chapter 15" },
+      { text: "Play a scale and don’t move to the next note until you can hear it in your head first.", source: "Chapter 15" },
+      { text: "Play the passage in different rhythms and different slurring patterns.", source: "Chapter 16" },
+      { text: "Click up the passage with the metronome, a notch at a time.", source: "Chapter 16" },
+      { text: "Practice in multiples — eight, four, three, two — for techniques that don’t hold up yet at slower tempos.", source: "Chapter 16" },
+      { text: "Keep a practice journal: your goals, problems and their solutions, what your teacher said, and what to work on next session.", source: "Conclusion" },
+      { text: "Don’t practice more than five hours a day. Take a 5-minute break every 25–30 minutes, and a longer one every 60–90.", source: "Conclusion" },
+      { text: "Give yourself an uncomfortably short amount of time to work on something. It forces focus.", source: "Conclusion" },
+      { text: "Decide ahead of time when you’re going to practice, and put it in your planner.", source: "Conclusion" },
+      { text: "Start small. Do one tiny thing that feels manageable.", source: "Conclusion" },
+      { text: "Use habit-bundling: pair something you already enjoy doing with your practicing.", source: "Conclusion" },
+      { text: "Find a practice buddy and hold each other accountable.", source: "Conclusion" },
+      { text: "Prioritize rest. Exhausted and burnt out, you won’t feel like practicing at all.", source: "Conclusion" },
+    ];
+
+    const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+    const weekIndex = Math.floor(Date.now() / MS_PER_WEEK);
+    const tip = PRACTICE_TIPS[weekIndex % PRACTICE_TIPS.length];
+
+    const textEl = document.getElementById("tip-text");
+    const sourceEl = document.getElementById("tip-source");
+    if (textEl && sourceEl) {
+      textEl.textContent = tip.text;
+      const slug = tip.source === "Conclusion"
+        ? "conclusion"
+        : "ch" + tip.source.replace("Chapter ", "");
+      sourceEl.textContent = "";
+      const link = document.createElement("a");
+      link.href = "practice-strategies.html#" + slug;
+      link.textContent = tip.source + " · Practice Strategies";
+      sourceEl.appendChild(link);
+    }
+  })();
 </script>
 </body>
 </html>

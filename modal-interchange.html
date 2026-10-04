@@ -173,6 +173,24 @@
     line-height: 1.1;
   }
 
+  .practice-link {
+    flex: none;
+    align-self: center;
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px 13px;
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    background: var(--panel);
+    color: var(--accent);
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .practice-link:hover { color: var(--ink); border-color: var(--accent-soft); }
+
   .wordmark {
     margin-top: 3px;
     color: var(--muted);
@@ -210,6 +228,8 @@
     <tbody id="chart-body"></tbody>
   </table>
 </div>
+
+<a class="practice-link" href="practice-strategies.html">Complete List of Practice Strategies &rarr;</a>
 
 <p class="wordmark">RyderSharpeMusic</p>
 

@@ -12,6 +12,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Drone Circle">
 <meta name="theme-color" content="#0c0a07">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0c0a07;
@@ -358,11 +361,14 @@
   }
   .wordmark {
     margin-top: 26px;
-    color: var(--muted);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    opacity: 0.55;
+    opacity: 0.75;
+    text-shadow: 0 0 10px rgba(168, 153, 104, 0.2);
   }
   .hint {
     margin-top: 14px;
@@ -430,11 +436,11 @@
   <div class="control">
     <label for="wave">Timbre</label>
     <select id="wave">
-      <option value="warm" selected>Warm (filtered saw)</option>
+      <option value="warm">Warm (filtered saw)</option>
       <option value="reed">Reed (filtered square)</option>
       <option value="pure">Pure (sine)</option>
       <option value="glass">Glass (triangle)</option>
-      <option value="organ">Organ (drawbar)</option>
+      <option value="organ" selected>Organ (drawbar)</option>
       <option value="bow">Bowed string</option>
       <option value="choir">Choir (vowel formants)</option>
       <option value="bell">Bell (FM)</option>
@@ -451,8 +457,8 @@
   <div class="control">
     <label for="temperament">Temperament</label>
     <select id="temperament">
-      <option value="equal" selected>Equal</option>
-      <option value="just">Just (key centre D)</option>
+      <option value="equal">Equal</option>
+      <option value="just" selected>Just (key centre D)</option>
     </select>
   </div>
   <div class="control">
@@ -461,7 +467,7 @@
   </div>
 </div>
 
-<p class="wordmark">RyderSharpeMusic</p>
+<p class="wordmark">Ryder Sharpe Music</p>
 
 <script>
 (function () {

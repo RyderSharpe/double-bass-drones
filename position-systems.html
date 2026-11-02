@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2 Position Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0a07;
+    --panel: #1c1712;
+    --panel-edge: #5c5340;
+    --ink: #eee7d8;
+    --muted: #8c8672;
+    --accent: #efe3c0;
+    --accent-soft: #a89968;
+    --wedge: #17140f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 40px;
+    position: relative;
+  }
+  /* Same worn-surface texture as the Drone Circle page, for visual
+     consistency across all three pages. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.24;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJtIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4yMiIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJzIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IDAuMDI1IiBudW1PY3RhdmVzPSIyIiBzZWVkPSI2IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIiByZXN1bHQ9InQiLz48ZmVDb2xvck1hdHJpeCBpbj0idCIgdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIgcmVzdWx0PSJnIi8+PGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImciPjxmZUZ1bmNSIHR5cGU9ImdhbW1hIiBhbXBsaXR1ZGU9IjEuNSIgZXhwb25lbnQ9IjIuNCIgb2Zmc2V0PSIwIi8+PGZlRnVuY0cgdHlwZT0iZ2FtbWEiIGFtcGxpdHVkZT0iMS41IiBleHBvbmVudD0iMi40IiBvZmZzZXQ9IjAiLz48ZmVGdW5jQiB0eXBlPSJnYW1tYSIgYW1wbGl0dWRlPSIxLjUiIGV4cG9uZW50PSIyLjQiIG9mZnNldD0iMCIvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIyMCIgZmlsdGVyPSJ1cmwoI24pIi8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNtKSIgb3BhY2l0eT0iMC42Ii8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiIGZpbHRlcj0idXJsKCNzKSIgb3BhY2l0eT0iMC41OCIvPjwvc3ZnPg==");
+    background-repeat: repeat;
+    background-size: 220px 220px;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(238, 231, 216, 0.095) 0px,
+        rgba(238, 231, 216, 0.095) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      radial-gradient(ellipse at 50% 40%, rgba(239, 227, 192, 0.09) 0%, transparent 62%);
+    background-repeat: repeat, no-repeat;
+    background-size: auto, cover;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body::after { animation: scanline-drift 9s linear infinite; }
+    @keyframes scanline-drift {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 -4px, 0 0; }
+    }
+  }
+
+  .back-link {
+    align-self: flex-start;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    margin-bottom: 18px;
+    max-width: 720px;
+    width: 100%;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  header { text-align: center; margin-bottom: 26px; max-width: 720px; width: 100%; }
+  .eyebrow {
+    display: block;
+    color: var(--muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.7rem;
+    letter-spacing: 0.03em;
+    background-image:
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIj48ZmlsdGVyIGlkPSJwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4zNSIgbnVtT2N0YXZlcz0iMyIgc2VlZD0iOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgcmVzdWx0PSJ0Ii8+PGZlQ29sb3JNYXRyaXggaW49InQiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjYgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMzAiIGhlaWdodD0iMTMwIiBmaWx0ZXI9InVybCgjcCkiLz48L3N2Zz4="),
+      linear-gradient(var(--ink), var(--ink));
+    background-size: 130px 130px, auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Layout concept: one tall fingerboard strip down the middle, Simandl blocks
+     staggered on its left, Rabbath blocks on its right, harmonic nodes as
+     dashed lines running across both. */
+  :root {
+    --sim: #c2a95f;
+    --rab: #7fa7ad;
+    --hg: #d08a62;
+    --hd: #9aa6d6;
+    --hb: #a7bd78;
+    --row: #15110d;
+    --row-alt: #0e0b08;
+  }
+  header { max-width: 960px; margin-bottom: 20px; }
+  .sys-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 960px;
+    margin-bottom: 12px;
+  }
+  .sys-card {
+    min-width: 0;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    padding: 12px 16px 14px;
+  }
+  .sys-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.15rem;
+    letter-spacing: 0.03em;
+    color: var(--accent);
+  }
+  .swatch { flex: none; width: 14px; height: 14px; border-radius: 2px; }
+  .sys-card p { color: var(--muted); font-size: 0.78rem; line-height: 1.55; margin-top: 6px; }
+  .sys-card p b { color: var(--ink); font-weight: 400; }
+
+  .readout {
+    width: 100%;
+    max-width: 960px;
+    min-height: 5.2em;
+    background: var(--wedge);
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    padding: 10px 16px;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .readout strong { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.02rem; color: var(--accent); letter-spacing: 0.02em; }
+  .readout .hint, .readout .rel { color: var(--muted); }
+
+  .fig-wrap {
+    width: 100%;
+    max-width: 960px;
+    overflow-x: auto;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    padding: 12px;
+  }
+  figure { width: 100%; max-width: 960px; display: flex; flex-direction: column; align-items: center; }
+  figure svg { display: block; width: 100%; min-width: 840px; height: auto; font-family: Georgia, "Times New Roman", serif; }
+  figcaption { color: var(--muted); font-size: 0.76rem; line-height: 1.55; margin-top: 12px; width: 100%; max-width: 960px; }
+  .swipe { display: none; color: var(--muted); font-size: 0.7rem; letter-spacing: 0.04em; margin-top: 8px; width: 100%; max-width: 960px; }
+  @media (max-width: 920px) { .swipe { display: block; } }
+
+  .colhead { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; fill: var(--muted); text-anchor: middle; }
+  .colhead.sim { fill: var(--sim); }
+  .colhead.rab { fill: var(--rab); }
+  .colhead.left { text-anchor: start; }
+  .rowbg { fill: var(--row); }
+  .rowbg.alt { fill: var(--row-alt); }
+  .gridline { stroke: var(--ink); stroke-opacity: 0.07; stroke-width: 1; }
+  .pitch { font-size: 12px; text-anchor: middle; fill: var(--ink); }
+  .pitch.alt { fill: var(--muted); font-size: 11px; }
+  .pitch.key { fill: var(--accent); font-weight: 700; }
+
+  .blk { cursor: pointer; outline: none; transition: opacity 0.15s ease; }
+  .blk rect { stroke-width: 1; transition: stroke 0.15s ease; }
+  .blk text { font-size: 15px; text-anchor: middle; dominant-baseline: central; fill: var(--ink); pointer-events: none; paint-order: stroke; stroke: #1c1712; stroke-width: 4px; stroke-linejoin: round; }
+  .blk.gen { cursor: default; }
+  .blk.gen rect { fill: #1f1a13; stroke: var(--panel-edge); }
+  .blk.gen text { font-size: 12px; fill: var(--accent-soft); letter-spacing: 0.04em; }
+  .blk.sim rect { fill: var(--sim); stroke: var(--sim); stroke-opacity: 0.75; }
+  .blk.rab rect { fill: var(--rab); stroke: var(--rab); stroke-opacity: 0.75; }
+  .blk.c0 rect { fill-opacity: 0.20; }
+  .blk.c1 rect { fill-opacity: 0.31; }
+  .blk.c2 rect { fill-opacity: 0.42; }
+  .blk.thumb rect { stroke-dasharray: 4 3; fill-opacity: 0.26; }
+  .blk:hover rect, .blk:focus-visible rect { stroke: var(--accent); stroke-opacity: 1; }
+  .has-sel .blk:not(.gen) { opacity: 0.38; }
+  .has-sel .blk.rel { opacity: 0.9; }
+  .has-sel .blk.on { opacity: 1; }
+  .blk.on rect { stroke: var(--accent); stroke-opacity: 1; stroke-width: 2; }
+
+  .hline { stroke-width: 1.2; stroke-dasharray: 6 4; }
+  .hline.g { stroke: var(--hg); } .hline.d { stroke: var(--hd); } .hline.b { stroke: var(--hb); }
+  .hline { stroke-opacity: 0.7; }
+  .hlabel { font-size: 12px; }
+  .hlabel.g { fill: var(--hg); } .hlabel.d { fill: var(--hd); } .hlabel.b { fill: var(--hb); }
+  .hlabel .sub { fill: var(--muted); font-size: 11px; }
+  .band { fill: var(--accent); fill-opacity: 0.10; pointer-events: none; }
+  .bandline { stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 1; pointer-events: none; }
+
+  .notes {
+    width: 100%;
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .note {
+    min-width: 0;
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    padding: 12px 16px;
+    background: var(--panel);
+  }
+  .note h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 0.98rem;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+  .note p { color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+  .credit-line { width: 100%; max-width: 960px; color: var(--muted); font-size: 0.72rem; margin-top: 14px; text-align: center; letter-spacing: 0.02em; }
+
+  .wordmark {
+    margin-top: 28px;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    text-shadow: 0 0 10px rgba(168, 153, 104, 0.18);
+  }
+</style>
+</head>
+<body>
+<a class="back-link" href="./" style="max-width:960px">&larr; Drone Circle</a>
+
+<header>
+  <span class="eyebrow">Double bass fingerboard</span>
+  <h1>Two Position Systems</h1>
+  <p class="citation">Simandl and Rabbath compared along the G string, one semitone per row.</p>
+</header>
+
+<div class="sys-cards">
+  <div class="sys-card">
+    <h2><span class="swatch" style="background:var(--sim)"></span>Simandl</h2>
+    <p><b>Zimmermann / Drew</b> International ed., Applebaum, Essential Elements, String Explorer</p>
+  </div>
+  <div class="sys-card">
+    <h2><span class="swatch" style="background:var(--rab)"></span>Rabbath</h2>
+    <p><b>Vance / Green / Ellison / Robinson / Proto</b></p>
+  </div>
+</div>
+
+<div class="readout" id="readout" aria-live="polite"></div>
+
+<figure>
+  <div class="fig-wrap">
+    <svg id="chart" role="img" aria-label="Chart of double bass positions along the G string. Simandl positions are three-semitone blocks, each starting one semitone above the last. Rabbath positions are six longer blocks whose boundaries fall on natural harmonics."></svg>
+  </div>
+  <p class="swipe">Swipe sideways to see the whole chart.</p>
+  <figcaption>Hover or tap a block to light up its rows across both systems. Dashed lines mark natural harmonic nodes. Rows are equal semitone steps, so the spacing is not to scale with the string.</figcaption>
+</figure>
+
+<section class="notes">
+  <div class="note">
+    <h3>Simandl</h3>
+    <p>Each position covers three semitones and starts one semitone above the one before: Half, 1st, 2nd, 2&frac12;, 3rd, 3&frac12;, 4th, 5th, 5&frac12;, 6th, 6&frac12;, 7th. Neighbouring positions sit in different columns so they can overlap.</p>
+  </div>
+  <div class="note">
+    <h3>Rabbath</h3>
+    <p>Six longer positions. Each one ends on the pitch where the next begins, and those shared pitches fall on harmonic nodes: C, D, G, D, G.</p>
+  </div>
+  <div class="note">
+    <h3>Generic names</h3>
+    <p>First, Tuning, Block and Thumb are neutral names for the broad regions of the fingerboard that both systems divide up in their own way.</p>
+  </div>
+</section>
+
+<p class="credit-line">Adapted from the chart &ldquo;Two Position Systems at a Glance&rdquo; by Nicholas Walker, 2008.</p>
+
+<p class="wordmark">Ryder Sharpe Music</p>
+
+<script>
+(function () {
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var NOTES = ["G", "G♯/A♭", "A", "A♯/B♭", "B", "C", "C♯/D♭", "D", "D♯/E♭", "E", "F", "F♯/G♭"];
+  var ROWS = 32, ROW = 26, TOP = 46;
+  var W = 884, H = TOP + ROWS * ROW + 14;
+  var GEN_X = 0, GEN_W = 96;
+  var SIM_X = [104, 192, 280], SIM_W = 84;
+  var BOARD_X = 372, BOARD_W = 124;
+  var RAB_X = [504, 592], RAB_W = 84;
+  var LAB_X = 692;
+  var LINE_X1 = 104, LINE_X2 = 684;
+
+  // Simandl: [label, full name, first row]. Each covers rows p..p+2.
+  var SIM = [
+    ["Half", "Half position", 1], ["1st", "1st position", 2], ["2nd", "2nd position", 3],
+    ["2½", "2nd and a half position", 4], ["3rd", "3rd position", 5], ["3½", "3rd and a half position", 6],
+    ["4th", "4th position", 7], ["5th", "5th position", 8], ["5½", "5th and a half position", 9],
+    ["6th", "6th position", 10], ["6½", "6th and a half position", 11], ["7th", "7th position", 12]
+  ];
+  var SIM_THUMB = ["Thumb", "Thumb position", 13, 23];
+  // Rabbath: [label, first row, last row, column (0 near board, 1 far)]
+  var RAB = [
+    ["1st", 0, 5, 0], ["2nd", 5, 7, 1], ["3rd", 7, 12, 0],
+    ["4th", 12, 19, 1], ["5th", 19, 24, 0], ["6th", 24, 31, 1]
+  ];
+  var GEN = [["First", 0, 4], ["Tuning", 5, 6], ["Block", 7, 11], ["Thumb", 12, 23]];
+  // Harmonic node lines at the top edge of a row: [row, name, sub, colour class]
+  var HARM = [
+    [0, "Open G string", "", "g"], [5, "G harmonic", "15ma", "g"],
+    [7, "D harmonic", "8va above fingered pitch", "d"], [12, "G harmonic", "8va above open string", "g"],
+    [19, "D harmonic", "", "d"], [24, "G harmonic", "15ma", "g"],
+    [28, "B harmonic", "", "b"], [31, "D harmonic", "", "d"]
+  ];
+
+  var svg = document.getElementById("chart");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
+
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function txt(parent, attrs, s) { var t = el("text", attrs, parent); t.textContent = s; return t; }
+  function yTop(n) { return TOP + n * ROW; }
+  function pitchName(n) { return n === 0 ? "G (open string)" : NOTES[n % 12]; }
+  function boardLabel(n) { return n === 0 ? "Open G" : n === 12 ? "G 8va" : n === 24 ? "G 15ma" : NOTES[n % 12]; }
+
+  // Column headers
+  txt(svg, { "class": "colhead", x: GEN_X + GEN_W / 2, y: 28 }, "Generic");
+  txt(svg, { "class": "colhead sim", x: (SIM_X[0] + SIM_X[2] + SIM_W) / 2, y: 28 }, "Simandl");
+  txt(svg, { "class": "colhead", x: BOARD_X + BOARD_W / 2, y: 28 }, "G string");
+  txt(svg, { "class": "colhead rab", x: (RAB_X[0] + RAB_X[1] + RAB_W) / 2, y: 28 }, "Rabbath");
+  txt(svg, { "class": "colhead left", x: LAB_X, y: 28 }, "Harmonic nodes");
+
+  // Fingerboard rows
+  var gBoard = el("g", {}, svg);
+  for (var n = 0; n < ROWS; n++) {
+    var acc = NOTES[n % 12].indexOf("♯") !== -1;
+    el("rect", { "class": "rowbg" + (acc ? " alt" : ""), x: BOARD_X, y: yTop(n), width: BOARD_W, height: ROW }, gBoard);
+    var key = n === 0 || n === 12 || n === 24;
+    txt(gBoard, { "class": "pitch" + (acc ? " alt" : "") + (key ? " key" : ""), x: BOARD_X + BOARD_W / 2, y: yTop(n) + ROW / 2 + 4 }, boardLabel(n));
+  }
+  // Faint row guides across the block area
+  var gGrid = el("g", {}, svg);
+  for (n = 0; n <= ROWS; n++) {
+    el("line", { "class": "gridline", x1: GEN_W + 4, x2: LINE_X2, y1: yTop(n), y2: yTop(n) }, gGrid);
+  }
+  // Harmonic lines and labels
+  var gHarm = el("g", {}, svg);
+  HARM.forEach(function (h) {
+    var y = yTop(h[0]);
+    el("line", { "class": "hline " + h[3], x1: LINE_X1, x2: LINE_X2, y1: y, y2: y }, gHarm);
+    var t = el("text", { "class": "hlabel " + h[3], x: LAB_X }, gHarm);
+    var sub = h[2];
+    if (sub && sub.length <= 6) {
+      t.setAttribute("y", y + 4);
+      t.appendChild(document.createTextNode(h[1] + " "));
+      var s = el("tspan", { "class": "sub" }, t); s.textContent = "(" + sub + ")";
+    } else if (sub) {
+      t.setAttribute("y", y - 3);
+      t.appendChild(document.createTextNode(h[1]));
+      var s2 = el("tspan", { "class": "sub", x: LAB_X, dy: 14 }, t); s2.textContent = sub;
+    } else {
+      t.setAttribute("y", y + 4);
+      t.textContent = h[1];
+    }
+  });
+
+  // Blocks
+  var blocks = [];
+  var gBlocks = el("g", {}, svg);
+  function addBlock(o) {
+    var g = el("g", { "class": "blk " + o.cls, tabindex: o.gen ? "-1" : "0", role: o.gen ? "presentation" : "button", "aria-label": o.aria || "" }, gBlocks);
+    var y = yTop(o.a) + 1.5, h = (o.b - o.a + 1) * ROW - 3;
+    el("rect", { x: o.x, y: y, width: o.w, height: h, rx: 2 }, g);
+    if (o.lines) {
+      txt(g, { x: o.x + o.w / 2, y: y + h / 2 - 8 }, o.lines[0]);
+      txt(g, { x: o.x + o.w / 2, y: y + h / 2 + 8 }, o.lines[1]);
+    } else {
+      txt(g, { x: o.x + o.w / 2, y: y + h / 2 }, o.label);
+    }
+    o.el = g;
+    if (!o.gen) { o.id = blocks.length; blocks.push(o); g.setAttribute("data-id", o.id); }
+  }
+  GEN.forEach(function (g) {
+    addBlock({ gen: true, cls: "gen", x: GEN_X, w: GEN_W, a: g[1], b: g[2], lines: [g[0], "Position"] });
+  });
+  SIM.forEach(function (p) {
+    var a = p[2], col = a % 3 === 0 ? 0 : a % 3 === 2 ? 1 : 2;
+    addBlock({ sys: "sim", cls: "sim c" + col, x: SIM_X[col], w: SIM_W, a: a, b: a + 2, label: p[0], full: p[1], name: "Simandl " + p[1],
+      aria: "Simandl " + p[1] });
+  });
+  addBlock({ sys: "sim", cls: "sim c2 thumb", x: SIM_X[2], w: SIM_W, a: SIM_THUMB[2], b: SIM_THUMB[3], label: SIM_THUMB[0], full: SIM_THUMB[1], name: "Simandl " + SIM_THUMB[1], aria: "Simandl " + SIM_THUMB[1] });
+  RAB.forEach(function (p, i) {
+    addBlock({ sys: "rab", cls: "rab c" + (i % 2 === 0 ? 1 : 2), x: RAB_X[p[3]], w: RAB_W, a: p[1], b: p[2], label: p[0], full: p[0] + " position", name: "Rabbath " + p[0] + " position",
+      aria: "Rabbath " + p[0] + " position" });
+  });
+
+  // Highlight band (drawn last, ignores the pointer)
+  var gBand = el("g", { "pointer-events": "none" }, svg);
+  var band = el("rect", { "class": "band", x: GEN_W + 4, width: LINE_X2 - GEN_W - 4, y: 0, height: 0, visibility: "hidden" }, gBand);
+  var bl1 = el("line", { "class": "bandline", x1: GEN_W + 4, x2: LINE_X2, visibility: "hidden" }, gBand);
+  var bl2 = el("line", { "class": "bandline", x1: GEN_W + 4, x2: LINE_X2, visibility: "hidden" }, gBand);
+
+  var readout = document.getElementById("readout");
+  var locked = null, hover = null;
+
+  function pitchList(a, b) {
+    var out = [];
+    for (var n = a; n <= b; n++) out.push(pitchName(n));
+    return out.join(", ");
+  }
+  function show() {
+    var id = hover !== null ? hover : locked;
+    blocks.forEach(function (b) { b.el.classList.remove("on", "rel"); });
+    if (id === null) {
+      svg.classList.remove("has-sel");
+      band.setAttribute("visibility", "hidden"); bl1.setAttribute("visibility", "hidden"); bl2.setAttribute("visibility", "hidden");
+      readout.innerHTML = '<span class="hint">Hover or tap a block to see its pitches and which positions in the other system overlap it. Tap again to release.</span>';
+      return;
+    }
+    var s = blocks[id];
+    svg.classList.add("has-sel");
+    s.el.classList.add("on");
+    var rel = [];
+    blocks.forEach(function (b) {
+      if (b.sys !== s.sys && b.a <= s.b && b.b >= s.a) { b.el.classList.add("rel"); rel.push(b); }
+    });
+    var y0 = yTop(s.a), y1 = yTop(s.b + 1);
+    band.setAttribute("y", y0); band.setAttribute("height", y1 - y0); band.setAttribute("visibility", "visible");
+    bl1.setAttribute("y1", y0); bl1.setAttribute("y2", y0); bl1.setAttribute("visibility", "visible");
+    bl2.setAttribute("y1", y1); bl2.setAttribute("y2", y1); bl2.setAttribute("visibility", "visible");
+    var other = s.sys === "sim" ? "Rabbath" : "Simandl";
+    var names = rel.map(function (b) { return b.label === "Half" ? "Half" : b.label === "Thumb" ? "Thumb" : b.label; }).join(", ");
+    readout.innerHTML = "<strong>" + s.name + "</strong><br>" + pitchList(s.a, s.b) +
+      '<br><span class="rel">' + other + " positions that overlap: " + (names || "none") + "</span>";
+  }
+
+  function idOf(target) {
+    var g = target.closest ? target.closest(".blk:not(.gen)") : null;
+    return g ? parseInt(g.getAttribute("data-id"), 10) : null;
+  }
+  svg.addEventListener("pointerover", function (e) {
+    if (e.pointerType !== "mouse") return;
+    var id = idOf(e.target);
+    if (id !== null) { hover = id; show(); }
+  });
+  svg.addEventListener("pointerout", function (e) {
+    if (e.pointerType !== "mouse") return;
+    var id = idOf(e.target);
+    if (id !== null && hover === id) { hover = null; show(); }
+  });
+  svg.addEventListener("click", function (e) {
+    var id = idOf(e.target);
+    if (id === null) { locked = null; hover = null; show(); return; }
+    locked = locked === id ? null : id;
+    hover = null;
+    show();
+  });
+  svg.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var id = idOf(e.target);
+    if (id === null) return;
+    e.preventDefault();
+    locked = locked === id ? null : id; hover = null; show();
+  });
+
+  // Opening state: show one real example so the readout is not empty.
+  locked = blocks.findIndex(function (b) { return b.name === "Simandl 3rd position"; });
+  show();
+})();
+</script>
+</body>
+</html>
